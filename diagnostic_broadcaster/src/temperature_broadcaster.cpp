@@ -69,7 +69,7 @@ controller_interface::CallbackReturn TemperatureBroadcaster::on_configure(
 
   // Initialize temperature message
   realtime_publisher_->lock();
-  realtime_publisher_->msg_.header.frame_id = params_.frame_id;
+  realtime_publisher_->msg_.header.frame_id = 1/*params_.frame_id*/;
   realtime_publisher_->unlock();
 
   return controller_interface::CallbackReturn::SUCCESS;
