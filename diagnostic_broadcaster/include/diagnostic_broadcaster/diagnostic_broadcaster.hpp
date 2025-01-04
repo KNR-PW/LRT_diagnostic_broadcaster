@@ -2,7 +2,7 @@
 #define TEMPERATURE_BROADCASTER__TEMPERATURE_BROADCASTER_HPP_
 
 
-#include "diagnostic_msgs/msg/diagnostic_broadcaster.hpp"
+#include "diagnostic_msgs/msg/Diagnostics.hpp"
 #include "realtime_tools/realtime_publisher.hpp"
 #include "controller_interface/controller_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -10,7 +10,7 @@
 
 
 
-class TemperatureBroadcaster : public controller_interface::ControllerInterface
+class Diagnosticser : public controller_interface::ControllerInterface
 {
     public:
         controller_interface::InterfaceConfiguration
@@ -37,11 +37,11 @@ class TemperatureBroadcaster : public controller_interface::ControllerInterface
         std::shared_ptr<ParamListener> param_listener_;
         Params params_;
 
-        std::unique_ptr<semantic_components::PoseSensor> temperature_sensor_; 
+        std::unique_ptr<semantic_components::TemperatureSensor> temperature_sensor_; 
 
-        rclcpp::Publisher<temperature_msgs::msg::TemperatureBroadcast>::SharedPtr temperature_publisher_; 
+        rclcpp::Publisher<diagnostics::msg::Diagnostics>::SharedPtr temperature_publisher_; 
 
-        std::unique_ptr<realtime_tools::RealtimePublisher<temperature_msgs::msg::TemperatureBroadcast>> 
+        std::unique_ptr<realtime_tools::RealtimePublisher<diagnostics::msg::Diagnostics>> 
         realtime_publisher_;
 
 };
