@@ -1,6 +1,7 @@
 #ifndef TEMPERATURE_BROADCASTER__TEMPERATURE_BROADCASTER_HPP_
 #define TEMPERATURE_BROADCASTER__TEMPERATURE_BROADCASTER_HPP_
 
+#include <unordered_map>
 
 #include "diagnostic_msgs/msg/Diagnostics.hpp"
 #include "realtime_tools/realtime_publisher.hpp"
@@ -9,10 +10,13 @@
 #include "rclcpp/publisher.hpp"
 
 
-
-class Diagnosticser : public controller_interface::ControllerInterface
+namespace diagnostic_broadcaster
+{
+class DiagnosticBroadcaster : public controller_interface::ControllerInterface
 {
     public:
+        DiagnosticBroadcaster();
+
         controller_interface::InterfaceConfiguration
         command_interface_configuration() const override;
         
@@ -33,18 +37,27 @@ class Diagnosticser : public controller_interface::ControllerInterface
         controller_interface::return_type update(
             const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
-    private:
-        std::shared_ptr<ParamListener> param_listener_;
-        Params params_;
+    protected:
+        bool init_joint_data();
+        void init_realtime_publisher_msg();
+    protected:
 
-        std::unique_ptr<semantic_components::TemperatureSensor> temperature_sensor_; 
+        std::vector<std::string> interface_names = {"temperature"}; // DECLARATION OF AN ARRAY WHERE WE POINT WHICH STATE INTERFACE DO WE NEED TO BROADCAST 
+        std::vector<std::string> joint_names_;                      // TO ADD MORE INTERFACES YOU NEED TO UPDATE Diagnostic.msg
+                                                                    // FOR EXAMPLE: interace_names = {"temperature", "pressure"}
+                                                                    // In Diagnostics.msg
+                                                                    // add new line:  float64[] pressure;
+                                                                    // In diagnostic_broadcaster.cpp 
+                                                                    // Add new line in joint_state_init for new message line
+                                                                    // and
+                                                                    // Only the joints which have minimum one of the interfaces will be broadcasted
+        std::unordered_map<std::string, std::unordered_map<std::string, double>> joints_interfaces_values; 
 
-        rclcpp::Publisher<diagnostics::msg::Diagnostics>::SharedPtr temperature_publisher_; 
+        rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_; 
 
         std::unique_ptr<realtime_tools::RealtimePublisher<diagnostics::msg::Diagnostics>> 
         realtime_publisher_;
-
 };
-
+}
 #endif
 
