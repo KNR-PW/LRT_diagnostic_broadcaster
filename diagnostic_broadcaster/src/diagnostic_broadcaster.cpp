@@ -32,8 +32,7 @@ class State;
 namespace diagnostic_broadcaster
 {
 
-
-Diagnostic_broadcaster::Diagnostic_broadcaster(){};
+DiagnosticBroadcaster::DiagnosticBroadcaster(){};
 
 const auto kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
 
@@ -82,7 +81,7 @@ controller_interface::CallbackReturn DiagnosticBroadcaster::on_configure(
 
   // Initialize diagnostic message
   realtime_publisher_->lock();
-  realtime_publisher_->msg_.header.frame_id = 1/*params_.frame_id*/;
+  realtime_publisher_->msg_.header.frame_id = "Diagnostics"/*params_.frame_id*/;
   realtime_publisher_->unlock();
 
   return controller_interface::CallbackReturn::SUCCESS;
@@ -110,7 +109,7 @@ controller_interface::CallbackReturn DiagnosticBroadcaster::on_deactivate(
 }
 
 
-bool has_any_key(std::string _interface_name)
+bool DiagnosticBroadcaster::has_any_key(std::string _interface_name)
 {
   for(size_t i = 0; i < interface_names.size(); i++)
   {
@@ -119,7 +118,7 @@ bool has_any_key(std::string _interface_name)
   return false;
 }
 
-bool JointStateBroadcaster::init_joint_data()
+bool DiagnosticBroadcaster::init_joint_data()
 {
   joint_names_.clear();
   joints_interfaces_values.clear();
@@ -133,22 +132,22 @@ bool JointStateBroadcaster::init_joint_data()
   {
     if(has_any_key(si->get_interface_name()))
     {
-      joints.push_back(si->get_prefix_name());
+      joint_names_.push_back(si->get_prefix_name());
     }
   }
 
-  for(int i = 0; i < joint_names.size(); i++)
+  for(size_t i = 0; i < joint_names_.size(); i++)
   {
-    for(int j = 0; j < interface_names.size(); j++)
+    for(size_t j = 0; j < interface_names.size(); j++)
     {
-      joints_interfaces_values[joint_names[i]][interface_names[j]] = kUninitializedValue;
+      joints_interfaces_values[joint_names_[i]][interface_names[j]] = kUninitializedValue;
     }
   }
 
   return true;
 }
 
-void JointStateBroadcaster::init_realtime_publisher_msg()
+void DiagnosticBroadcaster::init_realtime_publisher_msg()
 {
   const size_t num_joints = joint_names_.size();
 

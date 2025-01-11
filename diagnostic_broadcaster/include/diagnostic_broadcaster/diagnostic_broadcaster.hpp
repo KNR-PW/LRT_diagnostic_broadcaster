@@ -3,7 +3,8 @@
 
 #include <unordered_map>
 
-#include "diagnostic_msgs/msg/Diagnostics.hpp"
+#include "diagnostic_msgs/msg/diagnostics.hpp"
+
 #include "realtime_tools/realtime_publisher.hpp"
 #include "controller_interface/controller_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -38,10 +39,10 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
             const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
     protected:
+        bool has_any_key(std::string _interface_name);
         bool init_joint_data();
         void init_realtime_publisher_msg();
     protected:
-
         std::vector<std::string> interface_names = {"temperature"}; // DECLARATION OF AN ARRAY WHERE WE POINT WHICH STATE INTERFACE DO WE NEED TO BROADCAST 
         std::vector<std::string> joint_names_;                      // TO ADD MORE INTERFACES YOU NEED TO UPDATE Diagnostic.msg
                                                                     // FOR EXAMPLE: interace_names = {"temperature", "pressure"}
@@ -55,7 +56,7 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_; 
 
-        std::unique_ptr<realtime_tools::RealtimePublisher<diagnostics::msg::Diagnostics>> 
+        std::unique_ptr<realtime_tools::RealtimePublisher<diagnostic_msgs::msg::Diagnostics>> 
         realtime_publisher_;
 };
 }

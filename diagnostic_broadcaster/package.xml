@@ -3,18 +3,29 @@
 <package format="3">
   <name>diagnostic_broadcaster</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="jonasz.mularski@gmail.com">jonasz</maintainer>
-  <license>TODO: License declaration</license>
+  <description>
+    A ROS 2 controller for broadcasting diagnostic data from hardware state interfaces.
+  </description>
 
+  <maintainer email="jonasz.mularski@gmail.com">Jonasz Mularski</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- Build tool dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- Runtime dependencies -->
   <depend>rclcpp</depend>
   <depend>controller_interface</depend>
   <depend>rclcpp_lifecycle</depend>
-
+  <depend>realtime_tools</depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>pluginlib</depend>
+  <depend>controller_manager_msgs</depend>
+  
+  <!-- Testing dependencies -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
