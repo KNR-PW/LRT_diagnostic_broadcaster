@@ -21,6 +21,7 @@
   <depend>diagnostic_msgs</depend>
   <depend>pluginlib</depend>
   <depend>controller_manager_msgs</depend>
+  <depend>hardware_interface</depend>
   
   <!-- Testing dependencies -->
   <test_depend>ament_lint_auto</test_depend>

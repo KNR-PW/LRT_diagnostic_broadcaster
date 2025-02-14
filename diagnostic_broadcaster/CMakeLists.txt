@@ -14,6 +14,7 @@ find_package(controller_interface REQUIRED)
 find_package(realtime_tools REQUIRED)
 find_package(diagnostic_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(hardware_interface REQUIRED)
 
 
 # Sources and headers
@@ -35,7 +36,7 @@ ament_target_dependencies(${PROJECT_NAME}
   realtime_tools
   diagnostic_msgs
   pluginlib
-
+  hardware_interface
 )
 
 # Register the controller as a plugin

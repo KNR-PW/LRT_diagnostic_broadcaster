@@ -23,18 +23,14 @@ namespace
 
 constexpr auto DEFAULT_DIAGNOSTIC_TOPIC = "~/diagnostics";
 
-}  // namespace
-namespace rclcpp_lifecycle
-{
-class State;
-}  // namespace rclcpp_lifecycle
+}  
 
 namespace diagnostic_broadcaster
 {
 
 DiagnosticBroadcaster::DiagnosticBroadcaster(){};
-
 const auto kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
+
 
 controller_interface::CallbackReturn DiagnosticBroadcaster::on_init()
 {
@@ -120,27 +116,18 @@ bool DiagnosticBroadcaster::has_any_key(std::string _interface_name)
 
 bool DiagnosticBroadcaster::init_joint_data()
 {
-  joint_names_.clear();
-  joints_interfaces_values.clear();
+  joint_state_interfaces_.clear();
 
   if (state_interfaces_.empty())
   {
     return false;
   }
 
-  for(auto si = state_interfaces_.crbegin(); si != state_interfaces_.crend(); si++)
+  for (auto si = state_interfaces_.rbegin(); si != state_interfaces_.rend(); si++)
   {
-    if(has_any_key(si->get_interface_name()))
+    if (has_any_key(si->get_interface_name()))
     {
-      joint_names_.push_back(si->get_prefix_name());
-    }
-  }
-
-  for(size_t i = 0; i < joint_names_.size(); i++)
-  {
-    for(size_t j = 0; j < interface_names.size(); j++)
-    {
-      joints_interfaces_values[joint_names_[i]][interface_names[j]] = kUninitializedValue;
+      joint_state_interfaces_.push_back(std::ref(*si));
     }
   }
 
@@ -171,28 +158,22 @@ controller_interface::return_type DiagnosticBroadcaster::update(
     realtime_publisher_->msg_.temperature.clear();
 
     // Iterate through state_interfaces_
-    for (const auto & state_interface : state_interfaces_)
+    for (auto si = joint_state_interfaces_.rbegin(); si != joint_state_interfaces_.rend(); si++)
     {
-      const std::string joint_name = state_interface.get_prefix_name();
-      const std::string interface_name = state_interface.get_interface_name();
+      const std::string joint_name = si->get().get_prefix_name();  // Dostęp przez get()
+      const std::string interface_name = si->get().get_interface_name();
+      double value = si->get().get_value();  // Pobranie wartości
+    
+      // Add the value to the message
+      realtime_publisher_->msg_.joints.push_back(joint_name);
+      realtime_publisher_->msg_.temperature.push_back(value);
 
-      // Condition to process only the "temperature" interface
-      if (interface_name == "temperature")
-      {
-        // Retrieve the value from the state_interface
-        double value = state_interface.get_value();
-
-        // Add the value to the message
-        realtime_publisher_->msg_.joints.push_back(joint_name);
-        realtime_publisher_->msg_.temperature.push_back(value);
-
-        RCLCPP_DEBUG(
-          get_node()->get_logger(),
-          "Updated joint: %s, interface: %s, value: %f",
-          joint_name.c_str(), interface_name.c_str(), value);
-      }
-      //add more if-statement for more interfaces
+      RCLCPP_DEBUG(
+        get_node()->get_logger(),
+        "Updated joint: %s, interface: %s, value: %f",
+        joint_name.c_str(), interface_name.c_str(), value);
     }
+
 
     // Publish the message
     realtime_publisher_->unlockAndPublish();

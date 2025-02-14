@@ -10,6 +10,7 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "rclcpp/publisher.hpp"
 
+#include "hardware_interface/loaned_state_interface.hpp"
 
 namespace diagnostic_broadcaster
 {
@@ -52,7 +53,9 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
                                                                     // Add new line in joint_state_init for new message line
                                                                     // and
                                                                     // Only the joints which have minimum one of the interfaces will be broadcasted
-        std::unordered_map<std::string, std::unordered_map<std::string, double>> joints_interfaces_values; 
+
+        using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
+        loaned_state_interfaces_t joint_state_interfaces_;
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_; 
 
