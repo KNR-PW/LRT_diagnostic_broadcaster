@@ -1,8 +1,6 @@
 #ifndef TEMPERATURE_BROADCASTER__TEMPERATURE_BROADCASTER_HPP_
 #define TEMPERATURE_BROADCASTER__TEMPERATURE_BROADCASTER_HPP_
 
-#include <unordered_map>
-
 #include "diagnostic_msgs/msg/diagnostics.hpp"
 
 #include "realtime_tools/realtime_publisher.hpp"
@@ -44,8 +42,13 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
         bool init_joint_data();
         void init_realtime_publisher_msg();
     protected:
+        bool useAllInterfaces = true;
+
+        
+        
+        std::vector<std::string> joint_names_ = {};
         std::vector<std::string> interface_names = {"temperature"}; // DECLARATION OF AN ARRAY WHERE WE POINT WHICH STATE INTERFACE DO WE NEED TO BROADCAST 
-        std::vector<std::string> joint_names_;                      // TO ADD MORE INTERFACES YOU NEED TO UPDATE Diagnostic.msg
+                                                                    // TO ADD MORE INTERFACES YOU NEED TO UPDATE Diagnostic.msg
                                                                     // FOR EXAMPLE: interace_names = {"temperature", "pressure"}
                                                                     // In Diagnostics.msg
                                                                     // add new line:  float64[] pressure;

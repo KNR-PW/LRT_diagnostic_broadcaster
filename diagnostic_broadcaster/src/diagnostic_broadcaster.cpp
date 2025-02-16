@@ -4,7 +4,6 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
@@ -49,7 +48,21 @@ controller_interface::InterfaceConfiguration DiagnosticBroadcaster::state_interf
 {
   controller_interface::InterfaceConfiguration state_interfaces_config;
 
-  state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
+  if(joint_names_.empty())
+  {
+    state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
+  }
+  else
+  {
+    state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+    for(size_t i = 0; i < joint_names_.size(); i++)
+    {
+      for(size_t j = 0; j < joint_names_.size(); j++)
+      {
+        state_interfaces_config.names.push_back(joint_names_[i] + "/" + interface_names[j]);
+      }
+    }
+  }
 
   return state_interfaces_config;
 }
@@ -122,13 +135,17 @@ bool DiagnosticBroadcaster::init_joint_data()
   {
     return false;
   }
-
+  
+  int index = 0;
   for (auto si = state_interfaces_.rbegin(); si != state_interfaces_.rend(); si++)
   {
     if (has_any_key(si->get_interface_name()))
     {
       joint_state_interfaces_.push_back(std::ref(*si));
+      joint_names_.push_back(joint_state_interfaces_[index].get().get_prefix_name());
+      index++;
     }
+    
   }
 
   return true;
@@ -137,9 +154,8 @@ bool DiagnosticBroadcaster::init_joint_data()
 void DiagnosticBroadcaster::init_realtime_publisher_msg()
 {
   const size_t num_joints = joint_names_.size();
-
-  
   auto & realtime_publisher_msg = realtime_publisher_->msg_;
+
   realtime_publisher_msg.joints = joint_names_;
   realtime_publisher_msg.temperature.resize(num_joints, kUninitializedValue);
   // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
@@ -150,28 +166,27 @@ controller_interface::return_type DiagnosticBroadcaster::update(
 {
   if (realtime_publisher_ && realtime_publisher_->trylock())
   {
-    // Set the timestamp
+    
     realtime_publisher_->msg_.header.stamp = time;
 
-    // Clear existing data in the message
-    realtime_publisher_->msg_.joints.clear();
-    realtime_publisher_->msg_.temperature.clear();
-
-    // Iterate through state_interfaces_
+    
+    int index = 0;
     for (auto si = joint_state_interfaces_.rbegin(); si != joint_state_interfaces_.rend(); si++)
     {
-      const std::string joint_name = si->get().get_prefix_name();  // Dostęp przez get()
       const std::string interface_name = si->get().get_interface_name();
-      double value = si->get().get_value();  // Pobranie wartości
+      const std::string joint_name = si->get().get_prefix_name();
+      double value = si->get().get_value();  
     
-      // Add the value to the message
-      realtime_publisher_->msg_.joints.push_back(joint_name);
-      realtime_publisher_->msg_.temperature.push_back(value);
+      
+      if(interface_name == "temperature")
+        realtime_publisher_->msg_.temperature[index] = value;
 
       RCLCPP_DEBUG(
         get_node()->get_logger(),
         "Updated joint: %s, interface: %s, value: %f",
         joint_name.c_str(), interface_name.c_str(), value);
+      
+      index++;
     }
 
 
