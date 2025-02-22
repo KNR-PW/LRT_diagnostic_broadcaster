@@ -57,7 +57,7 @@ controller_interface::InterfaceConfiguration DiagnosticBroadcaster::state_interf
     state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
     for(size_t i = 0; i < joint_names_.size(); i++)
     {
-      for(size_t j = 0; j < joint_names_.size(); j++)
+      for(size_t j = 0; j < interface_names.size(); j++)
       {
         state_interfaces_config.names.push_back(joint_names_[i] + "/" + interface_names[j]);
       }
@@ -82,8 +82,8 @@ controller_interface::CallbackReturn DiagnosticBroadcaster::on_configure(
   }
   catch (const std::exception & ex)
   {
-    fprintf(
-      stderr, "Exception thrown during publisher creation at configure stage with message: %s\n",
+    RCLCPP_ERROR(
+      get_node()->get_logger(), "Exception thrown during publisher creation at configure stage with message: %s\n",
       ex.what());
     return controller_interface::CallbackReturn::ERROR;
   }
