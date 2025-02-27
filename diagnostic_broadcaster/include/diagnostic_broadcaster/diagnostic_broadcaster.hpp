@@ -47,15 +47,7 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
         
         
         std::vector<std::string> joint_names_ = {};
-        std::vector<std::string> interface_names = {"temperature"}; // DECLARATION OF AN ARRAY WHERE WE POINT WHICH STATE INTERFACE DO WE NEED TO BROADCAST 
-                                                                    // TO ADD MORE INTERFACES YOU NEED TO UPDATE Diagnostic.msg
-                                                                    // FOR EXAMPLE: interace_names = {"temperature", "pressure"}
-                                                                    // In Diagnostics.msg
-                                                                    // add new line:  float64[] pressure;
-                                                                    // In diagnostic_broadcaster.cpp 
-                                                                    // Add new line in joint_state_init for new message line
-                                                                    // and
-                                                                    // Only the joints which have minimum one of the interfaces will be broadcasted
+        std::vector<std::string> interface_names = {"temperature"}; 
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
         loaned_state_interfaces_t joint_state_interfaces_;
