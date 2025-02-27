@@ -48,7 +48,7 @@ controller_interface::InterfaceConfiguration DiagnosticBroadcaster::state_interf
 {
   controller_interface::InterfaceConfiguration state_interfaces_config;
 
-  if(joint_names_.empty())
+  if(joint_names_.empty() || interface_names.empty())
   {
     state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
   }
