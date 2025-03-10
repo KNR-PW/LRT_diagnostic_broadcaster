@@ -41,13 +41,12 @@ class DiagnosticBroadcaster : public controller_interface::ControllerInterface
         bool has_any_key(std::string _interface_name);
         bool init_joint_data();
         void init_realtime_publisher_msg();
+        void assign_joints();
     protected:
         bool useAllInterfaces = true;
 
-        
-        
-        std::vector<std::string> joint_names_ = {};
-        std::vector<std::string> interface_names = {"temperature"}; 
+        std::unordered_set<std::string> joint_names_ = {};
+        std::unordered_set<std::string> interface_names = {"temperature"}; 
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
         loaned_state_interfaces_t joint_state_interfaces_;

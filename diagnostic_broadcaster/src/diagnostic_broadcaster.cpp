@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
@@ -48,7 +49,7 @@ controller_interface::InterfaceConfiguration DiagnosticBroadcaster::state_interf
 {
   controller_interface::InterfaceConfiguration state_interfaces_config;
 
-  if(joint_names_.empty() || interface_names.empty())
+  if(joint_names_.empty())
   {
     state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
   }
@@ -142,10 +143,8 @@ bool DiagnosticBroadcaster::init_joint_data()
     if (has_any_key(si->get_interface_name()))
     {
       joint_state_interfaces_.push_back(std::ref(*si));
-      joint_names_.push_back(joint_state_interfaces_[index].get().get_prefix_name());
       index++;
     }
-    
   }
 
   return true;
@@ -159,6 +158,14 @@ void DiagnosticBroadcaster::init_realtime_publisher_msg()
   realtime_publisher_msg.joints = joint_names_;
   realtime_publisher_msg.temperature.resize(num_joints, kUninitializedValue);
   // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
+}
+
+void DiagnosticBroadcaster::assign_joints(vector<hardware_interface::LoanedStateInterface> assigned_state_interfaces)
+{
+  for(size_t i = 0; i < assigned_state_interfacsses.size(); i++)
+  {
+    joint_names_.push_back(assigned_state_interfaces[i].get_prefix_name());
+  }
 }
 
 controller_interface::return_type DiagnosticBroadcaster::update(
