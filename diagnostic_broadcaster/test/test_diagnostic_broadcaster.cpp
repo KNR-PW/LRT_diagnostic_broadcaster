@@ -7,14 +7,19 @@
 
 using hardware_interface::LoanedStateInterface;
 
-void DiagnosticBroadcasterTest::SetUp() { diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); }
+void DiagnosticBroadcasterTest::SetUp() 
+{   
+  diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); 
+}
 
 void DiagnosticBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
 
 void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
 {
+  
   ASSERT_EQ(
-    diagnostic_broadcaster_->on_init(), rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS);
+    diagnostic_broadcaster_->init(), rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS);
+
 
   std::vector<LoanedStateInterface> state_interfaces;
 
