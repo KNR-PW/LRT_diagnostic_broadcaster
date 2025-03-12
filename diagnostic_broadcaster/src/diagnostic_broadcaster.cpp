@@ -160,11 +160,21 @@ void DiagnosticBroadcaster::init_realtime_publisher_msg()
   // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
 }
 
-void DiagnosticBroadcaster::assign_joints(vector<hardware_interface::LoanedStateInterface> assigned_state_interfaces)
+void DiagnosticBroadcaster::assign_joints(std::vector<hardware_interface::LoanedStateInterface> assigned_state_interfaces)
 {
-  for(size_t i = 0; i < assigned_state_interfacsses.size(); i++)
+  for(size_t i = 0; i < assigned_state_interfaces.size(); i++)
   {
-    joint_names_.push_back(assigned_state_interfaces[i].get_prefix_name());
+    bool hasFound = false;
+    for(size_t j = 0; j < joint_names_.size(); j++)
+    {
+      if(joint_names_[j] == assigned_state_interfaces[i].get_prefix_name())
+      {
+        hasFound = true;
+        break;
+      }
+    }
+    if(hasFound == false)
+      joint_names_.push_back(assigned_state_interfaces[i].get_prefix_name());
   }
 }
 

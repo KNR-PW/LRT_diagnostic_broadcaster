@@ -19,33 +19,30 @@ class DiagnosticBroadcasterTest : public ::testing::Test
 public:
   void SetUp();
   void TearDown();
-  void SetUpPoseBroadcaster();
-
+  void SetUpDiagnosticBroadcaster();
 protected:
-    const std::string joint_name_ = "test_pose";
-
-    std::array<double, 7> temperature_values_ = {
-    {30, 50, 20, 25.56034, 30.9999, 123, 60}};
-    
+    std::array<double, 5> temperature_values_ = {
+    {30.0, 50.0, 20.0, 25.56034, 100.0}};
+    const std::string joint_name_ = "test_joint";
     hardware_interface::StateInterface interface_1 {joint_name_ + "1", "temperature", &temperature_values_[0]};
     hardware_interface::StateInterface interface_2 {joint_name_ + "2", "temperature", &temperature_values_[1]};
     hardware_interface::StateInterface interface_3 {joint_name_ + "3", "temperature", &temperature_values_[2]};
     
     hardware_interface::StateInterface interface_4 {joint_name_ + "4", "temperature", &temperature_values_[3]};
-    hardware_interface::StateInterface interface_4 {joint_name_ + "4", "pressure", &temperature_values_[3]};
+    hardware_interface::StateInterface interface_5 {joint_name_ + "4", "pressure", &temperature_values_[4]};
     
-    hardware_interface::StateInterface interface_5 {joint_name_ + "5", "pressure", &temperature_values_[4]};
-    hardware_interface::StateInterface interface_6 {joint_name_ + "6", "position.x", &temperature_values_[5]};
+    hardware_interface::StateInterface interface_6 {joint_name_ + "5", "pressure", &temperature_values_[4]};
+    hardware_interface::StateInterface interface_7 {joint_name_ + "6", "position.x", &temperature_values_[4]};
     
     std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
 
     template <typename T>
     void subscribe_and_get_message(const std::string & topic, T & msg);
 
-}
+};
 
 template <typename T>
-void PoseBroadcasterTest::subscribe_and_get_message(const std::string & topic, T & msg)
+void DiagnosticBroadcasterTest::subscribe_and_get_message(const std::string & topic, T & msg)
 {
   // Create node for subscribing
   rclcpp::Node node{"test_subscription_node"};
@@ -67,7 +64,7 @@ void PoseBroadcasterTest::subscribe_and_get_message(const std::string & topic, T
       throw std::runtime_error("Failed to receive message on topic: " + topic);
     }
 
-    pose_broadcaster_->update(rclcpp::Time{0}, rclcpp::Duration::from_seconds(0.01));
+    diagnostic_broadcaster_->update(rclcpp::Time{0}, rclcpp::Duration::from_seconds(0.01));
 
     const auto timeout = std::chrono::milliseconds{5};
     const auto until = node.get_clock()->now() + timeout;
@@ -80,3 +77,5 @@ void PoseBroadcasterTest::subscribe_and_get_message(const std::string & topic, T
 
   msg = *received_msg;
 }
+
+#endif

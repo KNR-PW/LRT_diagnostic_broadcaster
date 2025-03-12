@@ -7,14 +7,14 @@
 
 using hardware_interface::LoanedStateInterface;
 
-void PoseBroadcasterTest::SetUp() { diagnostic_broadcaster_ = std::make_unique<PoseBroadcaster>(); }
+void DiagnosticBroadcasterTest::SetUp() { diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); }
 
-void PoseBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
+void DiagnosticBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
 
-void PoseBroadcasterTest::SetUpPoseBroadcaster()
+void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
 {
   ASSERT_EQ(
-    diagnostic_broadcaster_->on_init(), controller_interface::return_type::SUCCESS);
+    diagnostic_broadcaster_->on_init(), rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS);
 
   std::vector<LoanedStateInterface> state_interfaces;
 
@@ -26,12 +26,12 @@ void PoseBroadcasterTest::SetUpPoseBroadcaster()
   state_interfaces.emplace_back(interface_6);
 
 
-  diagnostic_broadcaster_->assign_interfaces(std::move(state_interfaces));
+  diagnostic_broadcaster_->assign_joints(std::move(state_interfaces));
 }
 
-TEST_F(PoseBroadcasterTest, Configure_Success)
+TEST_F(DiagnosticBroadcasterTest, Configure_Success)
 {
-  SetUpPoseBroadcaster();
+  SetUpDiagnosticBroadcaster();
 
   // Configure controller
   ASSERT_EQ(
@@ -49,9 +49,9 @@ TEST_F(PoseBroadcasterTest, Configure_Success)
     state_interface_conf.type, controller_interface::interface_configuration_type::INDIVIDUAL);
   ASSERT_EQ(state_interface_conf.names.size(), 6lu);
 }
-TEST_F(PoseBroadcasterTest, Activate_Success)
+TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
-  SetUpPoseBroadcaster();
+  SetUpDiagnosticBroadcaster();
 
   // Configure and activate controller
   ASSERT_EQ(
@@ -93,9 +93,9 @@ TEST_F(PoseBroadcasterTest, Activate_Success)
   }
 }
 
-TEST_F(PoseBroadcasterTest, Update_Success)
+TEST_F(DiagnosticBroadcasterTest, Update_Success)
 {
-  SetUpPoseBroadcaster();
+  SetUpDiagnosticBroadcaster();
 
   // Configure and activate controller
   ASSERT_EQ(
@@ -110,9 +110,9 @@ TEST_F(PoseBroadcasterTest, Update_Success)
     controller_interface::return_type::OK);
 }
 
-TEST_F(PoseBroadcasterTest, PublishSuccess)
+TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
 {
-  SetUpPoseBroadcaster();
+  SetUpDiagnosticBroadcaster();
 
   // Configure and activate controller
   ASSERT_EQ(
@@ -123,12 +123,21 @@ TEST_F(PoseBroadcasterTest, PublishSuccess)
     controller_interface::CallbackReturn::SUCCESS);
 
   // Subscribe to diagnostic topic
-  diagnostic_msgs::diagnostics diagnostic_msg;
+  diagnostic_msgs::msg::Diagnostics diagnostic_msg;
   subscribe_and_get_message("~/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
-  EXPECT_EQ(diagnost);
+  EXPECT_EQ(diagnostic_msg.joints[0], joint_name_+"1");
+  EXPECT_EQ(diagnostic_msg.joints[1], joint_name_+"2");
+  EXPECT_EQ(diagnostic_msg.joints[2], joint_name_+"3");
+  EXPECT_EQ(diagnostic_msg.joints[3], joint_name_+"4");
+  EXPECT_EQ(diagnostic_msg.joints.size(), 4);
+
+  EXPECT_EQ(diagnostic_msg.temperature[0], temperature_values_[0]);
+  EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[1]);
+  EXPECT_EQ(diagnostic_msg.temperature[2], temperature_values_[2]);
+  EXPECT_EQ(diagnostic_msg.temperature[3], temperature_values_[3]);
 }
 
 int main(int argc, char * argv[])
