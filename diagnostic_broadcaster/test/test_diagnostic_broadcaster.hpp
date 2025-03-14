@@ -6,7 +6,7 @@
 #include <array>
 #include <memory>
 #include <string>
-
+#include <limits>
 #include "rclcpp/executors.hpp"
 
 #include "diagnostic_broadcaster/diagnostic_broadcaster.hpp"
@@ -20,29 +20,31 @@ public:
   void SetUp();
   void TearDown();
   void SetUpDiagnosticBroadcaster();
+  void CheckJointsName(std::vector<std::string> actual_joint_names, std::vector<std::string> wanted_joint_names);
+
 protected:
-    std::array<double, 5> temperature_values_ = {
-    {30.0, 50.0, 20.0, 25.56034, 100.0}};
-    const std::string joint_name_ = "test_joint";
-    hardware_interface::StateInterface interface_1 {joint_name_ + "1", "temperature", &temperature_values_[0]};
-    hardware_interface::StateInterface interface_2 {joint_name_ + "2", "temperature", &temperature_values_[1]};
-    hardware_interface::StateInterface interface_3 {joint_name_ + "3", "temperature", &temperature_values_[2]};
-    
-    hardware_interface::StateInterface interface_4 {joint_name_ + "4", "temperature", &temperature_values_[3]};
-    hardware_interface::StateInterface interface_5 {joint_name_ + "4", "pressure", &temperature_values_[4]};
-    
-    hardware_interface::StateInterface interface_6 {joint_name_ + "5", "pressure", &temperature_values_[4]};
-    hardware_interface::StateInterface interface_7 {joint_name_ + "6", "position.x", &temperature_values_[4]};
-    
-    std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
+  std::array<double, 5> temperature_values_ = {
+      {30.0, 50.0, 20.0, 25.56034, 100.0}};
+  const std::string joint_name_ = "test_joint";
+  hardware_interface::StateInterface interface_1{joint_name_ + "1", "temperature", &temperature_values_[0]};
+  hardware_interface::StateInterface interface_2{joint_name_ + "2", "temperature", &temperature_values_[1]};
+  hardware_interface::StateInterface interface_3{joint_name_ + "3", "temperature", &temperature_values_[2]};
 
-    template <typename T>
-    void subscribe_and_get_message(const std::string & topic, T & msg);
+  hardware_interface::StateInterface interface_4{joint_name_ + "4", "temperature", &temperature_values_[3]};
+  hardware_interface::StateInterface interface_5{joint_name_ + "4", "pressure", &temperature_values_[4]};
 
+  hardware_interface::StateInterface interface_6{joint_name_ + "5", "pressure", &temperature_values_[4]};
+  hardware_interface::StateInterface interface_7{joint_name_ + "6", "position.x", &temperature_values_[4]};
+
+  std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
+
+  template <typename T>
+  void subscribe_and_get_message(const std::string &topic, T &msg);
+  std::string printJointNames(std::vector<std::string> joint_names);
 };
 
 template <typename T>
-void DiagnosticBroadcasterTest::subscribe_and_get_message(const std::string & topic, T & msg)
+void DiagnosticBroadcasterTest::subscribe_and_get_message(const std::string &topic, T &msg)
 {
   // Create node for subscribing
   rclcpp::Node node{"test_subscription_node"};
@@ -51,7 +53,8 @@ void DiagnosticBroadcasterTest::subscribe_and_get_message(const std::string & to
 
   // Create subscription
   typename T::SharedPtr received_msg;
-  const auto msg_callback = [&](const typename T::SharedPtr sub_msg) { received_msg = sub_msg; };
+  const auto msg_callback = [&](const typename T::SharedPtr sub_msg)
+  { received_msg = sub_msg; };
   const auto subscription = node.create_subscription<T>(topic, 10, msg_callback);
 
   // Update controller and spin until a message is received
@@ -76,6 +79,14 @@ void DiagnosticBroadcasterTest::subscribe_and_get_message(const std::string & to
   }
 
   msg = *received_msg;
+}
+
+void DiagnosticBroadcasterTest::CheckJointsName(std::vector<std::string> actual_joint_names, std::vector<std::string> wanted_joint_names)
+{
+  for (size_t i = 0; i < actual_joint_names.size(); i++)
+  {
+    EXPECT_EQ(actual_joint_names[i], wanted_joint_names[i]);
+  }
 }
 
 #endif
