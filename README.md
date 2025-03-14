@@ -1,4 +1,4 @@
->C++ program that broadcasts selected robot interfaces' data for diagnostics
+>ros2_control broadcaster that publishes selected hardware interfaces for diagnostics
 
 # [Diagnostic broadcaster](https://control.ros.org/humble/doc/ros2_controllers/doc/controllers_index.html#broadcasters)
 
