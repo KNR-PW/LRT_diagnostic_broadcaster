@@ -25,6 +25,8 @@ public:
 protected:
   std::array<double, 5> temperature_values_ = {
       {30.0, 50.0, 20.0, 25.56034, 100.0}};
+
+  double fault = 1.0;
   const std::string joint_name_ = "test_joint";
   hardware_interface::StateInterface interface_1{joint_name_ + "1", "temperature", &temperature_values_[0]};
   hardware_interface::StateInterface interface_2{joint_name_ + "2", "temperature", &temperature_values_[1]};
@@ -34,7 +36,7 @@ protected:
   hardware_interface::StateInterface interface_5{joint_name_ + "4", "pressure", &temperature_values_[4]};
 
   hardware_interface::StateInterface interface_6{joint_name_ + "5", "pressure", &temperature_values_[4]};
-  hardware_interface::StateInterface interface_7{joint_name_ + "6", "position.x", &temperature_values_[4]};
+  hardware_interface::StateInterface interface_7{joint_name_ + "6", "fault", &fault};
 
   std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
 

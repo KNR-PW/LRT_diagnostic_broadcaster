@@ -48,7 +48,7 @@ namespace diagnostic_broadcaster
 
     protected:
         std::vector<std::string> joint_names_ = {};
-        std::vector<std::string> interface_names = {"temperature"};
+        std::vector<std::string> interface_names = {"temperature, fault"};
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
         loaned_state_interfaces_t joint_state_interfaces_;

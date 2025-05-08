@@ -152,6 +152,7 @@ namespace diagnostic_broadcaster
 
     realtime_publisher_msg.joints = joint_names_;
     realtime_publisher_msg.temperature.resize(num_joints, kUninitializedValue);
+    realtime_publisher_msg.fault.resize(num_joints, kUninitializedValue);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
   }
 
@@ -190,6 +191,8 @@ namespace diagnostic_broadcaster
 
         if (interface_name == "temperature")
           realtime_publisher_->msg_.temperature[index] = value;
+        else if (interface_name == "fault")
+          realtime_publisher_->msg_.fault[index] = value;
 
         RCLCPP_DEBUG(
             get_node()->get_logger(),
