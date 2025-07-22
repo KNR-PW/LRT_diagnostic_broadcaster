@@ -151,8 +151,8 @@ namespace diagnostic_broadcaster
     auto &realtime_publisher_msg = realtime_publisher_->msg_;
 
     realtime_publisher_msg.joints = joint_names_;
-    realtime_publisher_msg.temperature.resize(num_joints, kUninitializedValue);
-    realtime_publisher_msg.fault.resize(num_joints, kUninitializedValue);
+    realtime_publisher_msg.temperature.resize(num_joints, -1);
+    realtime_publisher_msg.fault.resize(num_joints, -1);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
   }
 

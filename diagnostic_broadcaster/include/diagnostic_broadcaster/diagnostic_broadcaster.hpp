@@ -47,8 +47,11 @@ namespace diagnostic_broadcaster
         void init_realtime_publisher_msg();
 
     protected:
+    
+        std::shared_ptr<rclcpp_lifecycle::LifecycleNode> lifecycle_node_;
+        
         std::vector<std::string> joint_names_ = {};
-        std::vector<std::string> interface_names = {"temperature, fault"};
+        std::vector<std::string> interface_names = {"temperature", "fault"};
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
         loaned_state_interfaces_t joint_state_interfaces_;
