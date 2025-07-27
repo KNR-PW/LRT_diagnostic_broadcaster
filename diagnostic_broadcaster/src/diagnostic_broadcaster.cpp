@@ -182,25 +182,30 @@ namespace diagnostic_broadcaster
 
       realtime_publisher_->msg_.header.stamp = time;
 
-      int index = 0;
       for (auto si = joint_state_interfaces_.rbegin(); si != joint_state_interfaces_.rend(); si++)
       {
         const std::string interface_name = si->get().get_interface_name();
         const std::string joint_name = si->get().get_prefix_name();
         double value = si->get().get_value();
 
+        
+        auto it = std::find(joint_names_.begin(), joint_names_.end(), joint_name);
+        if (it == joint_names_.end())
+          continue;  
+
+        size_t joint_index = std::distance(joint_names_.begin(), it);
+
         if (interface_name == "temperature")
-          realtime_publisher_->msg_.temperature[index] = value;
+          realtime_publisher_->msg_.temperature[joint_index] = value;
         else if (interface_name == "fault")
-          realtime_publisher_->msg_.fault[index] = value;
+          realtime_publisher_->msg_.fault[joint_index] = value;
 
         RCLCPP_DEBUG(
             get_node()->get_logger(),
             "Updated joint: %s, interface: %s, value: %f",
             joint_name.c_str(), interface_name.c_str(), value);
-
-        index++;
       }
+
 
       // Publish the message
       realtime_publisher_->unlockAndPublish();
