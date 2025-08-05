@@ -21,7 +21,7 @@
 namespace
 {
 
-  constexpr auto DEFAULT_DIAGNOSTIC_TOPIC = "~/diagnostics";
+  
 
 }
 
@@ -72,7 +72,7 @@ namespace diagnostic_broadcaster
     try
     {
       diagnostic_publisher_ = get_node()->create_publisher<diagnostic_msgs::msg::Diagnostics>(
-          DEFAULT_DIAGNOSTIC_TOPIC, rclcpp::SystemDefaultsQoS());
+          diagnostic_broadcaster::DEFAULT_DIAGNOSTIC_TOPIC, rclcpp::SystemDefaultsQoS());
       realtime_publisher_ =
           std::make_unique<realtime_tools::RealtimePublisher<diagnostic_msgs::msg::Diagnostics>>(
               diagnostic_publisher_);
@@ -125,20 +125,33 @@ namespace diagnostic_broadcaster
 
   bool DiagnosticBroadcaster::init_joint_data()
   {
-    joint_state_interfaces_.clear();
+
+    temperature_interfaces_.clear();
+    fault_interfaces_.clear();
 
     if (state_interfaces_.empty())
     {
       return false;
     }
 
-    int index = 0;
+
     for (auto si = state_interfaces_.rbegin(); si != state_interfaces_.rend(); si++)
     {
-      if (has_any_key(si->get_interface_name()))
+      if (si->get_interface_name() == "temperature")
       {
-        joint_state_interfaces_.push_back(std::ref(*si));
-        index++;
+        temperature_interfaces_.push_back(std::ref(*si));
+        bool findFaultInterface = false;
+        for (auto si_fault = state_interfaces_.rbegin(); si_fault != state_interfaces_.rend(); si_fault++)
+        {
+          if(si_fault->get_interface_name() == "fault" && si_fault->get_prefix_name() == si->get_prefix_name())
+          {
+            fault_interfaces_.push_back(std::ref(*si_fault));
+            findFaultInterface = true;
+            break;
+          }
+        }
+        if(!findFaultInterface) RCLCPP_ERROR(get_node()->get_logger(), "Fault interface for this joint %s does not exist. Controller will not run.",
+                                            si->get_prefix_name().c_str());
       }
     }
 
@@ -147,15 +160,17 @@ namespace diagnostic_broadcaster
 
   void DiagnosticBroadcaster::init_realtime_publisher_msg()
   {
-    const size_t num_joints = joint_names_.size();
+    const size_t num_joints = temperature_interfaces_.size();
     auto &realtime_publisher_msg = realtime_publisher_->msg_;
 
-    realtime_publisher_msg.joints = joint_names_;
+    realtime_publisher_msg.joints.resize(num_joints, "");
     realtime_publisher_msg.temperature.resize(num_joints, -1);
     realtime_publisher_msg.fault.resize(num_joints, -1);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
   }
 
+
+  //@note For individual joint peaking
   void DiagnosticBroadcaster::assign_joints(std::vector<std::string> assigned_state_interfaces)
   {
     for (size_t i = 0; i < assigned_state_interfaces.size(); i++)
@@ -179,33 +194,33 @@ namespace diagnostic_broadcaster
   {
     if (realtime_publisher_ && realtime_publisher_->trylock())
     {
-
+      
       realtime_publisher_->msg_.header.stamp = time;
 
-      for (auto si = joint_state_interfaces_.rbegin(); si != joint_state_interfaces_.rend(); si++)
+      if (temperature_interfaces_.size() != fault_interfaces_.size()) {
+        RCLCPP_ERROR(get_node()->get_logger(), "Temperature and fault interfaces size mismatch!");
+        return controller_interface::return_type::ERROR;
+      }
+
+      for (size_t i = 0; i < temperature_interfaces_.size(); ++i)
       {
-        const std::string interface_name = si->get().get_interface_name();
-        const std::string joint_name = si->get().get_prefix_name();
-        double value = si->get().get_value();
+        auto& temp_si = *(temperature_interfaces_.rbegin() + i);
+        auto& fault_si = *(fault_interfaces_.rbegin() + i);
 
-        
-        auto it = std::find(joint_names_.begin(), joint_names_.end(), joint_name);
-        if (it == joint_names_.end())
-          continue;  
+        const std::string joint_name = temp_si.get().get_prefix_name();
+        double temp_value = temp_si.get().get_value();
+        double fault_value = fault_si.get().get_value();
 
-        size_t joint_index = std::distance(joint_names_.begin(), it);
-
-        if (interface_name == "temperature")
-          realtime_publisher_->msg_.temperature[joint_index] = value;
-        else if (interface_name == "fault")
-          realtime_publisher_->msg_.fault[joint_index] = value;
+        realtime_publisher_->msg_.joints[i] = joint_name;
+        realtime_publisher_->msg_.temperature[i] = temp_value;
+        realtime_publisher_->msg_.fault[i] = static_cast<int>(fault_value);
 
         RCLCPP_DEBUG(
             get_node()->get_logger(),
-            "Updated joint: %s, interface: %s, value: %f",
-            joint_name.c_str(), interface_name.c_str(), value);
+            "Updated joint: %s, temperature: %f, fault: %d",
+            joint_name.c_str(), temp_value, static_cast<int>(fault_value));
       }
-
+      
 
       // Publish the message
       realtime_publisher_->unlockAndPublish();

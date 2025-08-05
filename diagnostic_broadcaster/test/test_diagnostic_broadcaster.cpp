@@ -10,7 +10,7 @@ using hardware_interface::LoanedStateInterface;
 void DiagnosticBroadcasterTest::SetUp() 
 {   
   diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); 
-  diagnostic_broadcaster_->assign_joints({joint_name_ + "1", joint_name_ + "2", joint_name_ + "3", joint_name_ + "4", joint_name_ + "5", joint_name_ + "6"});
+  // diagnostic_broadcaster_->assign_joints({joint_name_ + "1", joint_name_ + "2", joint_name_ + "3", joint_name_ + "4", joint_name_ + "5", joint_name_ + "6"});
 }
 
 void DiagnosticBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
@@ -31,8 +31,9 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
   state_interfaces.emplace_back(interface_5);
   state_interfaces.emplace_back(interface_6);
   state_interfaces.emplace_back(interface_7);
+  
 
-  EXPECT_FALSE(diagnostic_broadcaster_->get_joint_names().empty());
+  EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
 
   diagnostic_broadcaster_->assign_interfaces({}, std::move(state_interfaces));
 }
@@ -54,8 +55,8 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
   // Verify state interface configuration
   const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
   EXPECT_EQ(
-    state_interface_conf.type, controller_interface::interface_configuration_type::INDIVIDUAL);
-  ASSERT_EQ(state_interface_conf.names.size(), 12lu);
+    state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
+  ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
@@ -78,8 +79,8 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
-      state_interface_conf.type, controller_interface::interface_configuration_type::INDIVIDUAL);
-    ASSERT_EQ(state_interface_conf.names.size(), 12lu);
+      state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
+    ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);
   }
 
   // Deactivate controller
@@ -96,8 +97,8 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
-      state_interface_conf.type, controller_interface::interface_configuration_type::INDIVIDUAL);
-    ASSERT_EQ(state_interface_conf.names.size(), 12lu);  // Should not change when deactivating
+      state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
+    ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);  // Should not change when deactivating
   }
 }
 
@@ -135,30 +136,26 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
+  EXPECT_EQ(diagnostic_msg.joints.size(), 3lu);
+  
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
-  EXPECT_EQ(diagnostic_msg.joints[0], joint_name_+"1");
-  EXPECT_EQ(diagnostic_msg.joints[1], joint_name_+"2");
-  EXPECT_EQ(diagnostic_msg.joints[2], joint_name_+"3");
-  EXPECT_EQ(diagnostic_msg.joints[3], joint_name_+"4");
-  EXPECT_EQ(diagnostic_msg.joints[4], joint_name_+"5");
-  EXPECT_EQ(diagnostic_msg.joints[5], joint_name_+"6");
-  EXPECT_EQ(diagnostic_msg.joints.size(), 6lu);
+  EXPECT_EQ(diagnostic_msg.joints[0], "test_joint1");
+  EXPECT_EQ(diagnostic_msg.joints[1], "test_joint2");
+  EXPECT_EQ(diagnostic_msg.joints[2], "test_joint3");
+  
 
   EXPECT_EQ(diagnostic_msg.temperature[0], temperature_values_[0]);
   EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[1]);
   EXPECT_EQ(diagnostic_msg.temperature[2], temperature_values_[2]);
-  EXPECT_EQ(diagnostic_msg.temperature[3], temperature_values_[3]);
-  EXPECT_EQ(diagnostic_msg.temperature[4], -1);
-  EXPECT_EQ(diagnostic_msg.temperature[5], -1);
-
-  EXPECT_EQ(diagnostic_msg.fault[0], -1);
-  EXPECT_EQ(diagnostic_msg.fault[1], -1);
-  EXPECT_EQ(diagnostic_msg.fault[2], -1);
-  EXPECT_EQ(diagnostic_msg.fault[3], -1);
-  EXPECT_EQ(diagnostic_msg.fault[4], -1);
+  
 
   int8_t expected = 1;
-  EXPECT_EQ(diagnostic_msg.fault[5], expected);
+  EXPECT_EQ(diagnostic_msg.fault[0], expected);
+  EXPECT_EQ(diagnostic_msg.fault[1], expected);
+  EXPECT_EQ(diagnostic_msg.fault[2], expected);
+
+
+  
 }
 
 

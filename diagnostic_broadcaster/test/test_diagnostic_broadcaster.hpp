@@ -28,15 +28,18 @@ protected:
 
   double fault = 1.0;
   const std::string joint_name_ = "test_joint";
-  hardware_interface::StateInterface interface_1{joint_name_ + "1", "temperature", &temperature_values_[0]};
-  hardware_interface::StateInterface interface_2{joint_name_ + "2", "temperature", &temperature_values_[1]};
-  hardware_interface::StateInterface interface_3{joint_name_ + "3", "temperature", &temperature_values_[2]};
 
-  hardware_interface::StateInterface interface_4{joint_name_ + "4", "temperature", &temperature_values_[3]};
-  hardware_interface::StateInterface interface_5{joint_name_ + "4", "pressure", &temperature_values_[4]};
+  hardware_interface::StateInterface interface_1{"test_joint1", "temperature", &temperature_values_[0]};
+  hardware_interface::StateInterface interface_2{"test_joint1", "fault", &fault};
 
-  hardware_interface::StateInterface interface_6{joint_name_ + "5", "pressure", &temperature_values_[4]};
-  hardware_interface::StateInterface interface_7{joint_name_ + "6", "fault", &fault};
+  hardware_interface::StateInterface interface_3{"test_joint2", "temperature", &temperature_values_[1]};
+  hardware_interface::StateInterface interface_4{"test_joint2", "fault", &fault};
+
+  hardware_interface::StateInterface interface_5{"test_joint3", "temperature", &temperature_values_[2]};
+  hardware_interface::StateInterface interface_6{"test_joint3", "fault", &fault};
+
+  hardware_interface::StateInterface interface_7{"test_joint4", "pressure", &temperature_values_[4]};
+  
 
   std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
 

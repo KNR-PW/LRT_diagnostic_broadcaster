@@ -12,6 +12,8 @@
 
 namespace diagnostic_broadcaster
 {
+    const std::string DEFAULT_DIAGNOSTIC_TOPIC = "~/diagnostics";
+
     class DiagnosticBroadcaster : public controller_interface::ControllerInterface
     {
     public:
@@ -39,6 +41,8 @@ namespace diagnostic_broadcaster
 
         const std::vector<std::string> &get_joint_names() const { return joint_names_; }
 
+        const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const { return state_interfaces_; }
+
         void assign_joints(std::vector<std::string> assigned_state_interfaces);
 
     protected:
@@ -47,14 +51,15 @@ namespace diagnostic_broadcaster
         void init_realtime_publisher_msg();
 
     protected:
-    
         std::shared_ptr<rclcpp_lifecycle::LifecycleNode> lifecycle_node_;
         
         std::vector<std::string> joint_names_ = {};
         std::vector<std::string> interface_names = {"temperature", "fault"};
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
-        loaned_state_interfaces_t joint_state_interfaces_;
+        loaned_state_interfaces_t temperature_interfaces_;
+
+        loaned_state_interfaces_t fault_interfaces_;
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 
