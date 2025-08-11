@@ -7,6 +7,7 @@
 #include "controller_interface/controller_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "rclcpp/publisher.hpp"
+#include "visibility_control.hpp"
 
 #include "hardware_interface/loaned_state_interface.hpp"
 
@@ -17,32 +18,44 @@ namespace diagnostic_broadcaster
     class DiagnosticBroadcaster : public controller_interface::ControllerInterface
     {
     public:
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         DiagnosticBroadcaster();
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::InterfaceConfiguration
         command_interface_configuration() const override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::InterfaceConfiguration
         state_interface_configuration() const override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_init() override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_configure(
             const rclcpp_lifecycle::State &previous_state) override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_activate(
             const rclcpp_lifecycle::State &previous_state) override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_deactivate(
             const rclcpp_lifecycle::State &previous_state) override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         controller_interface::return_type update(
             const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         const std::vector<std::string> &get_joint_names() const { return joint_names_; }
 
+        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const { return state_interfaces_; }
 
+
+        
         void assign_joints(std::vector<std::string> assigned_state_interfaces);
 
     protected:
@@ -52,8 +65,11 @@ namespace diagnostic_broadcaster
 
     protected:
         std::shared_ptr<rclcpp_lifecycle::LifecycleNode> lifecycle_node_;
-        
+
+        const double kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
+
         std::vector<std::string> joint_names_ = {};
+        int joint_num_ = 0;
         std::vector<std::string> interface_names = {"temperature", "fault"};
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;

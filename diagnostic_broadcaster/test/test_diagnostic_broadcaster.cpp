@@ -66,9 +66,6 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
   ASSERT_EQ(
     diagnostic_broadcaster_->on_configure(rclcpp_lifecycle::State{}),
     controller_interface::CallbackReturn::SUCCESS);
-  ASSERT_EQ(
-    diagnostic_broadcaster_->on_activate(rclcpp_lifecycle::State{}),
-    controller_interface::CallbackReturn::SUCCESS);
 
   // Verify command and state interface configuration
   {
@@ -82,6 +79,12 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
     ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);
   }
+
+  ASSERT_EQ(
+    diagnostic_broadcaster_->on_activate(rclcpp_lifecycle::State{}),
+    controller_interface::CallbackReturn::SUCCESS);
+
+  
 
   // Deactivate controller
   ASSERT_EQ(
@@ -137,7 +140,7 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
 
   // Verify content of diagnostic message
   EXPECT_EQ(diagnostic_msg.joints.size(), 3lu);
-  
+
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
   EXPECT_EQ(diagnostic_msg.joints[0], "test_joint1");
   EXPECT_EQ(diagnostic_msg.joints[1], "test_joint2");
