@@ -10,17 +10,14 @@ using hardware_interface::LoanedStateInterface;
 void DiagnosticBroadcasterTest::SetUp() 
 {   
   diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); 
-  // diagnostic_broadcaster_->assign_joints({joint_name_ + "1", joint_name_ + "2", joint_name_ + "3", joint_name_ + "4", joint_name_ + "5", joint_name_ + "6"});
 }
 
 void DiagnosticBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
 
 void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
 {
-
   ASSERT_EQ(
     diagnostic_broadcaster_->init("test_diagnostic_broadcaster"), controller_interface::return_type::OK);
-
 
   std::vector<LoanedStateInterface> state_interfaces;
 
@@ -32,7 +29,6 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
   state_interfaces.emplace_back(interface_6);
   state_interfaces.emplace_back(interface_7);
   
-
   EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
 
   diagnostic_broadcaster_->assign_interfaces({}, std::move(state_interfaces));
@@ -60,6 +56,7 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
+
   SetUpDiagnosticBroadcaster();
 
   // Configure and activate controller
@@ -83,8 +80,6 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
   ASSERT_EQ(
     diagnostic_broadcaster_->on_activate(rclcpp_lifecycle::State{}),
     controller_interface::CallbackReturn::SUCCESS);
-
-  
 
   // Deactivate controller
   ASSERT_EQ(
@@ -151,14 +146,11 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[1]);
   EXPECT_EQ(diagnostic_msg.temperature[2], temperature_values_[2]);
   
-
   int8_t expected = 1;
   EXPECT_EQ(diagnostic_msg.fault[0], expected);
   EXPECT_EQ(diagnostic_msg.fault[1], expected);
   EXPECT_EQ(diagnostic_msg.fault[2], expected);
 
-
-  
 }
 
 

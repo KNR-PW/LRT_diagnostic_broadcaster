@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <unordered_map>
+
 
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
@@ -18,23 +18,13 @@
 #include "rcutils/logging_macros.h"
 #include "std_msgs/msg/header.hpp"
 
-namespace
-{
-
-  
-
-}
 
 namespace diagnostic_broadcaster
 {
-
   DiagnosticBroadcaster::DiagnosticBroadcaster() {};
-
-  
 
   controller_interface::CallbackReturn DiagnosticBroadcaster::on_init()
   {
-    joint_names_.clear();
     return controller_interface::CallbackReturn::SUCCESS;
   }
 
@@ -117,19 +107,8 @@ namespace diagnostic_broadcaster
     return controller_interface::CallbackReturn::SUCCESS;
   }
 
-  bool DiagnosticBroadcaster::has_any_key(std::string _interface_name)
-  {
-    for (size_t i = 0; i < interface_names.size(); i++)
-    {
-      if (_interface_name == interface_names[i])
-        return true;
-    }
-    return false;
-  }
-
   bool DiagnosticBroadcaster::init_joint_data()
   {
-
     temperature_interfaces_.clear();
     fault_interfaces_.clear();
 
@@ -148,20 +127,24 @@ namespace diagnostic_broadcaster
         }
       }
     }
+
     joint_num_ = joint_names_.size();
 
     temperature_interfaces_.reserve(joint_num_);
     fault_interfaces_.reserve(joint_num_);
 
-    
-    for(size_t i = 0; i < state_interfaces_.size(); i++)
+    for (const auto & joint_name : joint_names_)
     {
-      std::string joint_name_temp =  state_interfaces_[i].get_interface_name();
-
-      if(joint_name_temp == "temperature")
-        temperature_interfaces_.push_back(state_interfaces_[i]);
-      else if(joint_name_temp == "fault")
-        fault_interfaces_.push_back(state_interfaces_[i]);
+      for (auto & iface : state_interfaces_)
+      {
+        if (iface.get_prefix_name() == joint_name)
+        {
+            if (iface.get_interface_name() == "temperature")
+              temperature_interfaces_.push_back(iface);
+            else if (iface.get_interface_name() == "fault")
+              fault_interfaces_.push_back(iface);
+        }
+     }
     }
 
     return true;
@@ -169,7 +152,6 @@ namespace diagnostic_broadcaster
 
   void DiagnosticBroadcaster::init_realtime_publisher_msg()
   {
-
     auto &realtime_publisher_msg = realtime_publisher_->msg_;
 
     realtime_publisher_msg.joints = joint_names_;
@@ -179,39 +161,17 @@ namespace diagnostic_broadcaster
   }
 
 
-  //@note For individual joint peaking
-  void DiagnosticBroadcaster::assign_joints(std::vector<std::string> assigned_state_interfaces)
-  {
-    for (size_t i = 0; i < assigned_state_interfaces.size(); i++)
-    {
-      bool hasFound = false;
-      for (size_t j = 0; j < joint_names_.size(); j++)
-      {
-        if (joint_names_[j] == assigned_state_interfaces[i])
-        {
-          hasFound = true;
-          break;
-        }
-      }
-      if (hasFound == false)
-        joint_names_.push_back(assigned_state_interfaces[i]);
-    }
-  }
-
   controller_interface::return_type DiagnosticBroadcaster::update(
       const rclcpp::Time &time, const rclcpp::Duration & /*period*/)
   {
     if (realtime_publisher_ && realtime_publisher_->trylock())
     {
-      
       realtime_publisher_->msg_.header.stamp = time;
 
       if (temperature_interfaces_.size() != fault_interfaces_.size()) {
         RCLCPP_ERROR(get_node()->get_logger(), "Temperature and fault interfaces size mismatch!");
         return controller_interface::return_type::ERROR;
       }
-
-
 
       for(int i = 0; i < joint_num_; i++)
       {
