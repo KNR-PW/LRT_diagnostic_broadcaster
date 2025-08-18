@@ -48,9 +48,9 @@ namespace diagnostic_broadcaster
       state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
       for (size_t i = 0; i < joint_names_.size(); i++)
       {
-        for (size_t j = 0; j < interface_names.size(); j++)
+        for (size_t j = 0; j < interface_names_.size(); j++)
         {
-          state_interfaces_config.names.push_back(joint_names_[i] + "/" + interface_names[j]);
+          state_interfaces_config.names.push_back(joint_names_[i] + "/" + interface_names_[j]);
         }
       }
     }
@@ -155,9 +155,9 @@ namespace diagnostic_broadcaster
     auto &realtime_publisher_msg = realtime_publisher_->msg_;
 
     realtime_publisher_msg.joints = joint_names_;
-    realtime_publisher_msg.temperature.resize(joint_num_, kUninitializedValue);
+    realtime_publisher_msg.temperature.resize(joint_num_, k_uninitialized_value_);
     realtime_publisher_msg.fault.resize(joint_num_, -1);
-    // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, kUninitializedValue);
+    // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
   }
 
 

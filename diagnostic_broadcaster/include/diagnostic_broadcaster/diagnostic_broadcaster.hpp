@@ -53,7 +53,7 @@ namespace diagnostic_broadcaster
 
         DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const { return state_interfaces_; }
-        
+
         protected:
         bool has_any_key(std::string _interface_name);
         bool init_joint_data();
@@ -63,11 +63,11 @@ namespace diagnostic_broadcaster
     protected:
         std::shared_ptr<rclcpp_lifecycle::LifecycleNode> lifecycle_node_;
 
-        const double kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
+        const double k_uninitialized_value_ = std::numeric_limits<double>::quiet_NaN();
 
         std::vector<std::string> joint_names_ = {};
         int joint_num_ = 0;
-        std::vector<std::string> interface_names = {"temperature", "fault"};
+        std::vector<std::string> interface_names_ = {"temperature", "fault"};
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
         loaned_state_interfaces_t temperature_interfaces_;
