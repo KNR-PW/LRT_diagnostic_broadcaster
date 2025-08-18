@@ -104,6 +104,7 @@ namespace diagnostic_broadcaster
       const rclcpp_lifecycle::State & /*previous_state*/)
   {
     joint_names_.clear();
+    release_interfaces();
     return controller_interface::CallbackReturn::SUCCESS;
   }
 
