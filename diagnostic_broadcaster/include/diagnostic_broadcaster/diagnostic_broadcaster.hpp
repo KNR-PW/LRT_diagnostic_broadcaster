@@ -51,14 +51,9 @@ namespace diagnostic_broadcaster
         DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
         const std::vector<std::string> &get_joint_names() const { return joint_names_; }
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
-        const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const { return state_interfaces_; }
-
         protected:
-        bool has_any_key(std::string _interface_name);
         bool init_joint_data();
         void init_realtime_publisher_msg();
-        void assign_joints(std::vector<std::string> assigned_state_interfaces);
 
     protected:
         std::shared_ptr<rclcpp_lifecycle::LifecycleNode> lifecycle_node_;
