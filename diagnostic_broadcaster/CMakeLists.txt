@@ -15,6 +15,22 @@ find_package(realtime_tools REQUIRED)
 find_package(diagnostic_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(hardware_interface REQUIRED)
+find_package(generate_parameter_library REQUIRED)
+
+generate_parameter_library(
+  diagnostic_parameters
+  src/diagnostic_parameters.yaml
+)
+
+add_executable(diagnostic_node src/diagnostic_broadcaster.cpp)
+target_link_libraries(diagnostic_node PRIVATE 
+  rclcpp::rclcpp
+  diagnostic_parameters
+)
+
+install(TARGETS diagnostic_node diagnostic_parameters
+  EXPORT ${PROJECT_NAME}Targets)
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
 
 
 # Sources and headers
