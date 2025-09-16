@@ -1,0 +1,18 @@
+diagnostic_broadcaster:
+  joint_names:
+    type: string_array
+    default: []
+
+  interface_names:
+    type: string_array
+    default: ["temperature"]
+    validation:
+      subset_of: ["temperature", "fault"]
+
+  data_update_diff:
+    temperature:
+      type: double
+      default: 0.1
+    fault:
+      type: double
+      default: 1.0
