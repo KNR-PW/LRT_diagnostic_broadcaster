@@ -1,18 +1,28 @@
 diagnostic_broadcaster:
   joint_names:
     type: string_array
-    default: []
+    read_only: true
+    default_value: []
+    validation:
+      unique<>: null
+      not_empty<>: null
+    description: "Names of joints"
+    
 
   interface_names:
     type: string_array
-    default: ["temperature"]
+    description: "Names of diagnostic interfaces"
+    default_value: ["temperature", "fault"]
+    read_only: true
     validation:
-      subset_of: ["temperature", "fault"]
+      subset_of<>: [["temperature", "fault"]]
+      unique<>: null
+      not_empty<>: null
 
-  data_update_diff:
-    temperature:
-      type: double
-      default: 0.1
-    fault:
-      type: double
-      default: 1.0
+  interface_params:
+    __map_interface_names:
+      update_threshold:
+        type: double
+        default_value: 0.1
+        read_only: true
+        description: "When interface values change by this amount, it will be noticed"

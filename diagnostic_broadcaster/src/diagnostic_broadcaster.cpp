@@ -21,6 +21,23 @@
 
 namespace diagnostic_broadcaster
 {
+
+  template<typename T>
+  void update_if_needed(
+      T &previous_val,
+      T new_val,
+      T threshold,
+      std::vector<T> &msg_array,
+      size_t index)
+  {
+    if (previous_val == 0) {
+      msg_array[index] = new_val;
+      previous_val = new_val;
+    } else if (std::abs(new_val - previous_val) > threshold) {
+      msg_array[index] = new_val;
+    }
+  }
+
   DiagnosticBroadcaster::DiagnosticBroadcaster() {};
 
   controller_interface::CallbackReturn DiagnosticBroadcaster::on_init()
@@ -53,18 +70,18 @@ namespace diagnostic_broadcaster
   {
     controller_interface::InterfaceConfiguration state_interfaces_config;
 
-    if (params_.joint_names_.empty())
+    if (params_.joint_names.empty())
     {
       state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
     }
     else
     {
       state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-      for (size_t i = 0; i < params_.joint_names__.size(); i++)
+      for (size_t i = 0; i < params_.joint_names.size(); i++)
       {
-        for (size_t j = 0; j < params_.interface_names__.size(); j++)
+        for (size_t j = 0; j < params_.interface_names.size(); j++)
         {
-          state_interfaces_config.names.push_back(params_.joint_names__[i] + "/" + params_.interface_names__.[j]);
+          state_interfaces_config.names.push_back(params_.joint_names[i] + "/" + params_.interface_names[j]);
         }
       }
     }
@@ -124,7 +141,7 @@ namespace diagnostic_broadcaster
 
   bool DiagnosticBroadcaster::has_a_key(const std::string &interface_name)
   {
-    for (const auto & name : params_.interface_names__)
+    for (const auto & name : params_.interface_names)
     {
       if (interface_name == name)
         return true;
@@ -185,22 +202,6 @@ namespace diagnostic_broadcaster
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
   }
 
-  template<typename T>
-  void update_if_needed(
-      T &previous_val,
-      T new_val,
-      T threshold,
-      std::vector<T> &msg_array,
-      size_t index)
-  {
-    if (previous_val == 0) {
-      msg_array[index] = new_val;
-      previous_val = new_val;
-    } else if (std::abs(new_val - previous_val) > threshold) {
-      msg_array[index] = new_val;
-    }
-  }
-
   controller_interface::return_type DiagnosticBroadcaster::update(
       const rclcpp::Time &time, const rclcpp::Duration & /*period*/)
   {
@@ -221,14 +222,14 @@ namespace diagnostic_broadcaster
         update_if_needed(
           previous_temp_val_,
           temp_value_,
-          params_.data_update_diff.temperature,
+          params_.interface_params.interface_names_map["temperature"].update_threshold,
           realtime_publisher_->msg_.temperature,
           i);
 
         update_if_needed(
           previous_fault_val_,
           fault_value_,
-          params_.data_update_diff.fault,
+          params_.interface_params.interface_names_map["fault"].update_threshold,
           realtime_publisher_->msg_.fault,
           i);
         

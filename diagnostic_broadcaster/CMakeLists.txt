@@ -7,15 +7,22 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # Dependencies
+set(THIS_PACKAGE_INCLUDE_DEPENDS
+  pluginlib
+  rclcpp 
+  rclcpp_lifecycle
+  realtime_tools 
+  controller_interface
+  diagnostic_msgs
+  hardware_interface
+  generate_parameter_library
+  parameter_traits
+  realtime_tools
+)
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
-find_package(controller_interface REQUIRED)
-find_package(realtime_tools REQUIRED)
-find_package(diagnostic_msgs REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(hardware_interface REQUIRED)
-find_package(generate_parameter_library REQUIRED)
+foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  find_package(${Dependency} REQUIRED)
+endforeach()
 
 # === Parameter library ===
 generate_parameter_library(
@@ -32,27 +39,20 @@ set(HEADERS
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(${PROJECT_NAME}
-  rclcpp
-  rclcpp_lifecycle
-  controller_interface
-  realtime_tools
-  diagnostic_msgs
-  pluginlib
-  hardware_interface
-)
-target_link_libraries(${PROJECT_NAME} PRIVATE diagnostic_parameters)
 
-# === Optional standalone node ===
-add_executable(diagnostic_node src/diagnostic_broadcaster.cpp)
-target_link_libraries(diagnostic_node PRIVATE
-  ${PROJECT_NAME}
+target_link_libraries(
+  ${PROJECT_NAME} PUBLIC
   diagnostic_parameters
-  rclcpp::rclcpp
+)
+
+ament_target_dependencies(
+  ${PROJECT_NAME} PUBLIC
+  ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
 # === Plugin registration ===
@@ -61,7 +61,6 @@ pluginlib_export_plugin_description_file(controller_interface diagnostic_broadca
 # === Installation ===
 install(TARGETS
     ${PROJECT_NAME}
-    diagnostic_node
     diagnostic_parameters
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
@@ -101,13 +100,7 @@ endif()
 
 # === Package exports ===
 ament_export_dependencies(
-  rclcpp
-  rclcpp_lifecycle
-  controller_interface
-  diagnostic_msgs
-  pluginlib
-  controller_manager
-  hardware_interface
+  ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
