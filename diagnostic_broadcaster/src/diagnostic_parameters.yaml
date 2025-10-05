@@ -5,7 +5,6 @@ diagnostic_broadcaster:
     default_value: []
     validation:
       unique<>: null
-      not_empty<>: null
     description: "Names of joints"
     
 

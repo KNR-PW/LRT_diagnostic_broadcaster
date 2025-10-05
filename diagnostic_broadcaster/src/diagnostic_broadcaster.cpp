@@ -22,22 +22,6 @@
 namespace diagnostic_broadcaster
 {
 
-  template<typename T>
-  void update_if_needed(
-      T &previous_val,
-      T new_val,
-      T threshold,
-      std::vector<T> &msg_array,
-      size_t index)
-  {
-    if (previous_val == 0) {
-      msg_array[index] = new_val;
-      previous_val = new_val;
-    } else if (std::abs(new_val - previous_val) > threshold) {
-      msg_array[index] = new_val;
-    }
-  }
-
   DiagnosticBroadcaster::DiagnosticBroadcaster() {};
 
   controller_interface::CallbackReturn DiagnosticBroadcaster::on_init()
@@ -53,8 +37,7 @@ namespace diagnostic_broadcaster
       return CallbackReturn::ERROR;
     }
 
-    previous_fault_val_ = 0;
-    previous_temp_val_ = 0;
+    previous_temp_val_.clear();
 
     return controller_interface::CallbackReturn::SUCCESS;
   }
@@ -198,6 +181,9 @@ namespace diagnostic_broadcaster
 
     realtime_publisher_msg.joints = joint_names_;
     realtime_publisher_msg.temperature.resize(joint_num_, k_uninitialized_value_);
+
+    previous_temp_val_.resize(joint_num_, k_uninitialized_value_);
+
     realtime_publisher_msg.fault.resize(joint_num_, -1);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
   }
@@ -214,25 +200,28 @@ namespace diagnostic_broadcaster
         return controller_interface::return_type::ERROR;
       }
 
+      realtime_publisher_->msg_.joints = joint_names_;
+
+      double threshold = params_.interface_params.interface_names_map["update_threshold"].update_threshold;
+
       for(int i = 0; i < joint_num_; i++)
       {
         double temp_value_ =  temperature_interfaces_[i].get().get_value();
         int8_t fault_value_ = static_cast<int>(fault_interfaces_[i].get().get_value());
-        
-        update_if_needed(
-          previous_temp_val_,
-          temp_value_,
-          params_.interface_params.interface_names_map["temperature"].update_threshold,
-          realtime_publisher_->msg_.temperature,
-          i);
 
-        update_if_needed(
-          previous_fault_val_,
-          fault_value_,
-          params_.interface_params.interface_names_map["fault"].update_threshold,
-          realtime_publisher_->msg_.fault,
-          i);
-        
+        if(std::isnan(previous_temp_val_[i]) || 
+          std::abs(temp_value_ - previous_temp_val_[i]) > threshold)
+        {
+          previous_temp_val_[i] = temp_value_;
+          realtime_publisher_->msg_.temperature[i] = temp_value_;
+        }
+        else 
+        {
+          previous_temp_val_[i] = temp_value_;
+        }
+
+        realtime_publisher_->msg_.fault[i] = fault_value_;
+
         RCLCPP_DEBUG(
           get_node()->get_logger(),
           "Updated joint: %s, temperature: %f, fault: %d",

@@ -71,10 +71,10 @@ namespace diagnostic_broadcaster
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
 
         loaned_state_interfaces_t temperature_interfaces_;
-        double previous_temp_val_;
+        std::vector<double> previous_temp_val_;
 
         loaned_state_interfaces_t fault_interfaces_;
-        double previous_fault_val_;
+        
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 

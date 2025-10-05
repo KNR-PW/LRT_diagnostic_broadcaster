@@ -13,6 +13,12 @@
 
 using diagnostic_broadcaster::DiagnosticBroadcaster;
 
+class FriendDiagnosticBroadcasterTest : public DiagnosticBroadcaster
+{
+  FRIEND_TEST(DiagnosticBroadcasterTest, Configure_Success);
+  FRIEND_TEST(DiagnosticBroadcasterTest, Activate_Success);
+};
+
 class DiagnosticBroadcasterTest : public ::testing::Test
 {
 
@@ -42,13 +48,14 @@ protected:
   hardware_interface::StateInterface interface_7{"test_joint4", "pressure", &temperature_values_[4]};
   
   
-  std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
+  std::unique_ptr<FriendDiagnosticBroadcasterTest> diagnostic_broadcaster_;
   
   template <typename T>
   void subscribe_and_get_message(const std::string &topic, T &msg);
   
   
   std::string printJointNames(std::vector<std::string> joint_names);
+
 };
 
 template <typename T>
