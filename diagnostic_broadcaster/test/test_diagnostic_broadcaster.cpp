@@ -7,35 +7,46 @@
 
 using hardware_interface::LoanedStateInterface;
 
+
 void DiagnosticBroadcasterTest::SetUp() 
-{   
-  diagnostic_broadcaster_ = std::make_unique<DiagnosticBroadcaster>(); 
+{  
+  diagnostic_broadcaster_ = std::make_unique<FriendDiagnosticBroadcasterTest>(); 
 }
 
 void DiagnosticBroadcasterTest::TearDown() { diagnostic_broadcaster_.reset(NULL); }
 
 void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
 {
-  ASSERT_EQ(
-    diagnostic_broadcaster_->init("test_diagnostic_broadcaster"), controller_interface::return_type::OK);
+    auto node = rclcpp::Node::make_shared("test_node");
 
-  std::vector<LoanedStateInterface> state_interfaces;
+    // Jawne wartości domyślne
+    node->declare_parameter<std::vector<std::string>>(
+        "diagnostic_broadcaster.joint_names", std::vector<std::string>{});
+    node->declare_parameter<std::vector<std::string>>(
+        "diagnostic_broadcaster.interface_names", std::vector<std::string>{"temperature", "fault"});
+    node->declare_parameter<double>(
+        "diagnostic_broadcaster.interface_params.__map_interface_names.update_threshold", 0.1);
 
-  state_interfaces.emplace_back(interface_1);
-  state_interfaces.emplace_back(interface_2);
-  state_interfaces.emplace_back(interface_3);
-  state_interfaces.emplace_back(interface_4);
-  state_interfaces.emplace_back(interface_5);
-  state_interfaces.emplace_back(interface_6);
-  state_interfaces.emplace_back(interface_7);
-  
-  EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
+    diagnostic_broadcaster_->init("test_diagnostic_broadcaster", "", rclcpp::NodeOptions());
 
-  diagnostic_broadcaster_->assign_interfaces({}, std::move(state_interfaces));
+    std::vector<LoanedStateInterface> state_interfaces;
+    state_interfaces.emplace_back(interface_1);
+    state_interfaces.emplace_back(interface_2);
+    state_interfaces.emplace_back(interface_3);
+    state_interfaces.emplace_back(interface_4);
+    state_interfaces.emplace_back(interface_5);
+    state_interfaces.emplace_back(interface_6);
+    state_interfaces.emplace_back(interface_7);
+
+    EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
+
+    diagnostic_broadcaster_->assign_interfaces({}, std::move(state_interfaces));
 }
+
 
 TEST_F(DiagnosticBroadcasterTest, Configure_Success)
 {
+  //ZROBIONY DO DiagnosticBroadcasterTest
   SetUpDiagnosticBroadcaster();
 
   // Configure controller
@@ -52,13 +63,14 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
   const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
   EXPECT_EQ(
     state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-  ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);
+  
+  //NIE DZIAŁA BEZ DZIEDZICZENIA
+  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
-
   SetUpDiagnosticBroadcaster();
-
+  
   // Configure and activate controller
   ASSERT_EQ(
     diagnostic_broadcaster_->on_configure(rclcpp_lifecycle::State{}),
@@ -70,11 +82,10 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     EXPECT_EQ(
       command_interface_conf.type, controller_interface::interface_configuration_type::NONE);
     EXPECT_TRUE(command_interface_conf.names.empty());
-
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
   }
 
   ASSERT_EQ(
@@ -96,7 +107,7 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->get_state_interfaces().size(), 7lu);  // Should not change when deactivating
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 0);
   }
 }
 
@@ -134,6 +145,7 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
+  
   EXPECT_EQ(diagnostic_msg.joints.size(), 3lu);
 
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");

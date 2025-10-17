@@ -13,6 +13,12 @@
 
 using diagnostic_broadcaster::DiagnosticBroadcaster;
 
+class FriendDiagnosticBroadcasterTest : public DiagnosticBroadcaster
+{
+  FRIEND_TEST(DiagnosticBroadcasterTest, Configure_Success);
+  FRIEND_TEST(DiagnosticBroadcasterTest, Activate_Success);
+};
+
 class DiagnosticBroadcasterTest : public ::testing::Test
 {
 
@@ -21,31 +27,35 @@ public:
   void TearDown();
   void SetUpDiagnosticBroadcaster();
   void CheckJointsName(std::vector<std::string> actual_joint_names, std::vector<std::string> wanted_joint_names);
-
+  const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const;
+  
 protected:
   std::array<double, 5> temperature_values_ = {
-      {30.0, 50.0, 20.0, 25.56034, 100.0}};
-
+    {30.0, 50.0, 20.0, 25.56034, 100.0}};
+  
   double fault = 1.0;
   const std::string joint_name_ = "test_joint";
-
+  
   hardware_interface::StateInterface interface_1{"test_joint1", "temperature", &temperature_values_[0]};
   hardware_interface::StateInterface interface_2{"test_joint1", "fault", &fault};
-
+  
   hardware_interface::StateInterface interface_3{"test_joint2", "temperature", &temperature_values_[1]};
   hardware_interface::StateInterface interface_4{"test_joint2", "fault", &fault};
-
+  
   hardware_interface::StateInterface interface_5{"test_joint3", "temperature", &temperature_values_[2]};
   hardware_interface::StateInterface interface_6{"test_joint3", "fault", &fault};
-
+  
   hardware_interface::StateInterface interface_7{"test_joint4", "pressure", &temperature_values_[4]};
   
-
-  std::unique_ptr<DiagnosticBroadcaster> diagnostic_broadcaster_;
-
+  
+  std::unique_ptr<FriendDiagnosticBroadcasterTest> diagnostic_broadcaster_;
+  
   template <typename T>
   void subscribe_and_get_message(const std::string &topic, T &msg);
+  
+  
   std::string printJointNames(std::vector<std::string> joint_names);
+
 };
 
 template <typename T>

@@ -10,6 +10,7 @@
 #include "visibility_control.hpp"
 
 #include "hardware_interface/loaned_state_interface.hpp"
+#include "diagnostic_broadcaster/diagnostic_parameters.hpp"
 
 namespace diagnostic_broadcaster
 {
@@ -18,40 +19,41 @@ namespace diagnostic_broadcaster
     class DiagnosticBroadcaster : public controller_interface::ControllerInterface
     {
     public:
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         DiagnosticBroadcaster();
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::InterfaceConfiguration
         command_interface_configuration() const override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::InterfaceConfiguration
         state_interface_configuration() const override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_init() override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_configure(
             const rclcpp_lifecycle::State &previous_state) override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_activate(
             const rclcpp_lifecycle::State &previous_state) override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::CallbackReturn on_deactivate(
             const rclcpp_lifecycle::State &previous_state) override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         controller_interface::return_type update(
             const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
-        DIAGNOSTIC_BROADCASTER_INTERFACE__VISIBILITY_PUBLIC
+        DIAGNOSTIC_BROADCASTER__VISIBILITY_PUBLIC
         const std::vector<std::string> &get_joint_names() const { return joint_names_; }
 
-        protected:
+    protected:
+        bool has_a_key(const std::string &interface_name);
         bool init_joint_data();
         void init_realtime_publisher_msg();
 
@@ -62,12 +64,17 @@ namespace diagnostic_broadcaster
 
         std::vector<std::string> joint_names_ = {};
         int joint_num_ = 0;
-        std::vector<std::string> interface_names_ = {"temperature", "fault"};
+
+        std::shared_ptr<ParamListener> param_listener_;
+        Params params_;
 
         using loaned_state_interfaces_t = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
+
         loaned_state_interfaces_t temperature_interfaces_;
+        std::vector<double> previous_temp_val_;
 
         loaned_state_interfaces_t fault_interfaces_;
+        
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 

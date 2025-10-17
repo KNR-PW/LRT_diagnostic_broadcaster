@@ -22,6 +22,8 @@
   <depend>pluginlib</depend>
   <depend>controller_manager_msgs</depend>
   <depend>hardware_interface</depend>
+  <depend>generate_parameter_library</depend>
+
   
   <!-- Testing dependencies -->
   <test_depend>ament_lint_auto</test_depend>

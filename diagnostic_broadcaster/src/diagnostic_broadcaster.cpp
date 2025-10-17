@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <cmath>
 
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
@@ -21,10 +21,24 @@
 
 namespace diagnostic_broadcaster
 {
+
   DiagnosticBroadcaster::DiagnosticBroadcaster() {};
 
   controller_interface::CallbackReturn DiagnosticBroadcaster::on_init()
   {
+    try
+    {
+      param_listener_ = std::make_shared<ParamListener>(get_node());
+      params_ = param_listener_->get_params();
+    }
+    catch (const std::exception & e)
+    {
+      fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+      return CallbackReturn::ERROR;
+    }
+
+    previous_temp_val_.clear();
+
     return controller_interface::CallbackReturn::SUCCESS;
   }
 
@@ -39,18 +53,18 @@ namespace diagnostic_broadcaster
   {
     controller_interface::InterfaceConfiguration state_interfaces_config;
 
-    if (get_joint_names().empty())
+    if (params_.joint_names.empty())
     {
       state_interfaces_config.type = controller_interface::interface_configuration_type::ALL;
     }
     else
     {
       state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-      for (size_t i = 0; i < joint_names_.size(); i++)
+      for (size_t i = 0; i < params_.joint_names.size(); i++)
       {
-        for (size_t j = 0; j < interface_names_.size(); j++)
+        for (size_t j = 0; j < params_.interface_names.size(); j++)
         {
-          state_interfaces_config.names.push_back(joint_names_[i] + "/" + interface_names_[j]);
+          state_interfaces_config.names.push_back(params_.joint_names[i] + "/" + params_.interface_names[j]);
         }
       }
     }
@@ -108,6 +122,16 @@ namespace diagnostic_broadcaster
     return controller_interface::CallbackReturn::SUCCESS;
   }
 
+  bool DiagnosticBroadcaster::has_a_key(const std::string &interface_name)
+  {
+    for (const auto & name : params_.interface_names)
+    {
+      if (interface_name == name)
+        return true;
+    }
+    return false;
+  }
+  
   bool DiagnosticBroadcaster::init_joint_data()
   {
     temperature_interfaces_.clear();
@@ -122,7 +146,9 @@ namespace diagnostic_broadcaster
     {
       for(const auto& interface: state_interfaces_)
       {
-        if(interface.get_interface_name() == "temperature")
+        if(has_a_key(interface.get_interface_name()) && 
+          std::find(joint_names_.begin(), joint_names_.end(), 
+          interface.get_prefix_name()) == joint_names_.end())
         {
           joint_names_.push_back(interface.get_prefix_name());
         }
@@ -157,10 +183,12 @@ namespace diagnostic_broadcaster
 
     realtime_publisher_msg.joints = joint_names_;
     realtime_publisher_msg.temperature.resize(joint_num_, k_uninitialized_value_);
+
+    previous_temp_val_.resize(joint_num_, k_uninitialized_value_);
+
     realtime_publisher_msg.fault.resize(joint_num_, -1);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
   }
-
 
   controller_interface::return_type DiagnosticBroadcaster::update(
       const rclcpp::Time &time, const rclcpp::Duration & /*period*/)
@@ -174,18 +202,32 @@ namespace diagnostic_broadcaster
         return controller_interface::return_type::ERROR;
       }
 
+      realtime_publisher_->msg_.joints = joint_names_;
+
+      double threshold = params_.interface_params.interface_names_map["update_threshold"].update_threshold;
+
       for(int i = 0; i < joint_num_; i++)
       {
         double temp_value_ =  temperature_interfaces_[i].get().get_value();
         int8_t fault_value_ = static_cast<int>(fault_interfaces_[i].get().get_value());
-        
-        realtime_publisher_->msg_.temperature[i] = temp_value_;
+
+        if(std::isnan(previous_temp_val_[i]) || 
+          std::abs(temp_value_ - previous_temp_val_[i]) > threshold)
+        {
+          previous_temp_val_[i] = temp_value_;
+          realtime_publisher_->msg_.temperature[i] = temp_value_;
+        }
+        else 
+        {
+          previous_temp_val_[i] = temp_value_;
+        }
+
         realtime_publisher_->msg_.fault[i] = fault_value_;
 
         RCLCPP_DEBUG(
-            get_node()->get_logger(),
-            "Updated joint: %s, temperature: %f, fault: %d",
-            joint_names_[i].c_str(), temp_value_, fault_value_);
+          get_node()->get_logger(),
+          "Updated joint: %s, temperature: %f, fault: %d",
+          joint_names_[i].c_str(), temp_value_, fault_value_);
       }
       
       // Publish the message
