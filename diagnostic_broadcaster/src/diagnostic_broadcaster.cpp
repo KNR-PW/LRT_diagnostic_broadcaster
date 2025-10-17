@@ -146,7 +146,9 @@ namespace diagnostic_broadcaster
     {
       for(const auto& interface: state_interfaces_)
       {
-        if(has_a_key(interface.get_interface_name()))
+        if(has_a_key(interface.get_interface_name()) && 
+          std::find(joint_names_.begin(), joint_names_.end(), 
+          interface.get_prefix_name()) == joint_names_.end())
         {
           joint_names_.push_back(interface.get_prefix_name());
         }

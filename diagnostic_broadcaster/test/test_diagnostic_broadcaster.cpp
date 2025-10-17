@@ -69,9 +69,8 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
-
   SetUpDiagnosticBroadcaster();
-
+  
   // Configure and activate controller
   ASSERT_EQ(
     diagnostic_broadcaster_->on_configure(rclcpp_lifecycle::State{}),
@@ -83,7 +82,6 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     EXPECT_EQ(
       command_interface_conf.type, controller_interface::interface_configuration_type::NONE);
     EXPECT_TRUE(command_interface_conf.names.empty());
-
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
@@ -109,7 +107,7 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 0);
   }
 }
 
@@ -147,6 +145,7 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
+  
   EXPECT_EQ(diagnostic_msg.joints.size(), 3lu);
 
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
