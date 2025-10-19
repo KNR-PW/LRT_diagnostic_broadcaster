@@ -11,10 +11,10 @@ diagnostic_broadcaster:
   interface_names:
     type: string_array
     description: "Names of diagnostic interfaces"
-    default_value: ["temperature", "fault"]
+    default_value: ["temperature", "fault", "motor_effort"]
     read_only: true
     validation:
-      subset_of<>: [["temperature", "fault"]]
+      subset_of<>: [["temperature", "fault", "motor_effort"]]
       unique<>: null
       not_empty<>: null
 

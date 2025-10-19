@@ -64,7 +64,7 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
   EXPECT_EQ(
     state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
   
-  //NIE DZIAŁA BEZ DZIEDZICZENIA
+
   ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
@@ -145,23 +145,23 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
-  
-  EXPECT_EQ(diagnostic_msg.joints.size(), 3lu);
+  EXPECT_EQ(diagnostic_msg.joints.size(), 2lu);
 
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
   EXPECT_EQ(diagnostic_msg.joints[0], "test_joint1");
   EXPECT_EQ(diagnostic_msg.joints[1], "test_joint2");
-  EXPECT_EQ(diagnostic_msg.joints[2], "test_joint3");
-  
 
   EXPECT_EQ(diagnostic_msg.temperature[0], temperature_values_[0]);
-  EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[1]);
-  EXPECT_EQ(diagnostic_msg.temperature[2], temperature_values_[2]);
+  EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[2]);
   
   int8_t expected = 1;
   EXPECT_EQ(diagnostic_msg.fault[0], expected);
   EXPECT_EQ(diagnostic_msg.fault[1], expected);
-  EXPECT_EQ(diagnostic_msg.fault[2], expected);
+
+  EXPECT_EQ(diagnostic_msg.motor_effort[0], motor_effort);
+  EXPECT_EQ(diagnostic_msg.motor_effort[1], motor_effort);
+
+
 
 }
 
