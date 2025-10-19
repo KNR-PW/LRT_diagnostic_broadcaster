@@ -74,6 +74,9 @@ namespace diagnostic_broadcaster
         std::vector<double> previous_temp_val_;
 
         loaned_state_interfaces_t fault_interfaces_;
+
+        loaned_state_interfaces_t meffort_interfaces_;
+        std::vector<double> previous_meffort_val_;
         
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;

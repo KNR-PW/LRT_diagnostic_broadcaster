@@ -38,6 +38,7 @@ namespace diagnostic_broadcaster
     }
 
     previous_temp_val_.clear();
+    previous_meffort_val_.clear();
 
     return controller_interface::CallbackReturn::SUCCESS;
   }
@@ -134,8 +135,11 @@ namespace diagnostic_broadcaster
   
   bool DiagnosticBroadcaster::init_joint_data()
   {
+    joint_names_.clear();
+
     temperature_interfaces_.clear();
     fault_interfaces_.clear();
+    meffort_interfaces_.clear();
 
     if (state_interfaces_.empty())
     {
@@ -159,6 +163,7 @@ namespace diagnostic_broadcaster
 
     temperature_interfaces_.reserve(joint_num_);
     fault_interfaces_.reserve(joint_num_);
+    meffort_interfaces_.reserve(joint_num_);
 
     for (const auto & joint_name : joint_names_)
     {
@@ -170,6 +175,8 @@ namespace diagnostic_broadcaster
               temperature_interfaces_.push_back(iface);
             else if (iface.get_interface_name() == "fault")
               fault_interfaces_.push_back(iface);
+            else if (iface.get_interface_name() == "motor_effort")
+              meffort_interfaces_.push_back(iface);
         }
      }
     }
@@ -183,8 +190,10 @@ namespace diagnostic_broadcaster
 
     realtime_publisher_msg.joints = joint_names_;
     realtime_publisher_msg.temperature.resize(joint_num_, k_uninitialized_value_);
+    realtime_publisher_msg.motor_effort.resize(joint_num_, k_uninitialized_value_);
 
     previous_temp_val_.resize(joint_num_, k_uninitialized_value_);
+    previous_meffort_val_.resize(joint_num_, k_uninitialized_value_);
 
     realtime_publisher_msg.fault.resize(joint_num_, -1);
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
@@ -197,8 +206,8 @@ namespace diagnostic_broadcaster
     {
       realtime_publisher_->msg_.header.stamp = time;
 
-      if (temperature_interfaces_.size() != fault_interfaces_.size()) {
-        RCLCPP_ERROR(get_node()->get_logger(), "Temperature and fault interfaces size mismatch!");
+      if (temperature_interfaces_.size() != fault_interfaces_.size() && temperature_interfaces_.size() != meffort_interfaces_.size()) {
+        RCLCPP_ERROR(get_node()->get_logger(), "Interfaces size mismatch!");
         return controller_interface::return_type::ERROR;
       }
 
@@ -209,6 +218,7 @@ namespace diagnostic_broadcaster
       for(int i = 0; i < joint_num_; i++)
       {
         double temp_value_ =  temperature_interfaces_[i].get().get_value();
+        double meffort_value_ = meffort_interfaces_[i].get().get_value();
         int8_t fault_value_ = static_cast<int>(fault_interfaces_[i].get().get_value());
 
         if(std::isnan(previous_temp_val_[i]) || 
@@ -222,12 +232,23 @@ namespace diagnostic_broadcaster
           previous_temp_val_[i] = temp_value_;
         }
 
+        if(std::isnan(previous_meffort_val_[i]) || 
+          std::abs(meffort_value_ - previous_meffort_val_[i]) > threshold)
+        {
+          previous_meffort_val_[i] = meffort_value_;
+          realtime_publisher_->msg_.motor_effort[i] = meffort_value_;
+        }
+        else 
+        {
+          previous_meffort_val_[i] = meffort_value_;
+        }
+
         realtime_publisher_->msg_.fault[i] = fault_value_;
 
         RCLCPP_DEBUG(
           get_node()->get_logger(),
-          "Updated joint: %s, temperature: %f, fault: %d",
-          joint_names_[i].c_str(), temp_value_, fault_value_);
+          "Updated joint: %s, temperature: %f, fault: %d, motor_effort: %g",
+          joint_names_[i].c_str(), temp_value_, fault_value_, meffort_value_);
       }
       
       // Publish the message

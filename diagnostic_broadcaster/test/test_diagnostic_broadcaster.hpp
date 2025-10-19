@@ -34,18 +34,19 @@ protected:
     {30.0, 50.0, 20.0, 25.56034, 100.0}};
   
   double fault = 1.0;
+  double motor_effort = 2.0;
+
   const std::string joint_name_ = "test_joint";
   
   hardware_interface::StateInterface interface_1{"test_joint1", "temperature", &temperature_values_[0]};
   hardware_interface::StateInterface interface_2{"test_joint1", "fault", &fault};
+  hardware_interface::StateInterface interface_3{"test_joint1", "motor_effort", &motor_effort};
+
+  hardware_interface::StateInterface interface_4{"test_joint2", "temperature", &temperature_values_[2]};
+  hardware_interface::StateInterface interface_5{"test_joint2", "fault", &fault};
+  hardware_interface::StateInterface interface_6{"test_joint2", "motor_effort", &motor_effort};
   
-  hardware_interface::StateInterface interface_3{"test_joint2", "temperature", &temperature_values_[1]};
-  hardware_interface::StateInterface interface_4{"test_joint2", "fault", &fault};
-  
-  hardware_interface::StateInterface interface_5{"test_joint3", "temperature", &temperature_values_[2]};
-  hardware_interface::StateInterface interface_6{"test_joint3", "fault", &fault};
-  
-  hardware_interface::StateInterface interface_7{"test_joint4", "pressure", &temperature_values_[4]};
+  hardware_interface::StateInterface interface_7{"test_joint3", "pressure", &temperature_values_[4]};
   
   
   std::unique_ptr<FriendDiagnosticBroadcasterTest> diagnostic_broadcaster_;
