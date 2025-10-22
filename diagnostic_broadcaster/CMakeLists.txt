@@ -39,7 +39,7 @@ set(HEADERS
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -71,9 +71,9 @@ install(TARGETS
 install(DIRECTORY include/
   DESTINATION include
 )
-install(FILES diagnostic_broadcaster_plugin.xml
-  DESTINATION share/${PROJECT_NAME}
-)
+# install(FILES diagnostic_broadcaster_plugin.xml
+#   DESTINATION share/${PROJECT_NAME}
+# )
 
 # === Tests ===
 if(BUILD_TESTING)
@@ -102,6 +102,7 @@ endif()
 ament_export_dependencies(
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_package()
