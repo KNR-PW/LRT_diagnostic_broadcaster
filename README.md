@@ -35,8 +35,6 @@ This broadcaster uses [generate_parameters_library](https://github.com/PickNikRo
 ```update_treshold``` parameter is currently used for setting up data update threshold for ```temperature``` and ```motor_effort``` interfaces
 
 
-\
-\
 ``diagnostic_broadcaster/diagnostic_parameters.yaml``:
 ```rb
 diagnostic_broadcaster:
