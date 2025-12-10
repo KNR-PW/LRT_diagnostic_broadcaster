@@ -2,8 +2,6 @@
 
 # [Diagnostic broadcaster](https://control.ros.org/humble/doc/ros2_controllers/doc/controllers_index.html#broadcasters)
 
-Problem has been described in https://github.com/KNR-PW/LRT_meldog_ros/issues/15
-
 ## Operating system
 https://releases.ubuntu.com/jammy/
 
@@ -28,12 +26,6 @@ https://releases.ubuntu.com/jammy/
 
 ## Parameters 
 This broadcaster uses [generate_parameters_library](https://github.com/PickNikRobotics/generate_parameter_library) to handle parameters. You can specify which joints and interfaces you want to be broadcasted.
-
-> [!NOTE]
-> By specifying which joints should be broadcasted ```state_interfaces_config.type``` changes from ```controller_interface::interface_configuration_type::ALL``` to ```controller_interface::interface_configuration_type::INDIVIDUAL;```. 
-
-```update_treshold``` parameter is currently used for setting up data update threshold for ```temperature``` and ```motor_effort``` interfaces
-
 
 ``diagnostic_broadcaster/diagnostic_parameters.yaml``:
 ```rb
@@ -66,4 +58,7 @@ diagnostic_broadcaster:
         description: "When interface values change by this amount, it will be noticed"
 
 ```
+> [!NOTE]
+> By specifying which joints should be broadcasted ```state_interfaces_config.type``` changes from ```controller_interface::interface_configuration_type::ALL``` to ```controller_interface::interface_configuration_type::INDIVIDUAL;```. 
 
+```update_treshold``` parameter is currently used for setting up data update threshold for ```temperature``` and ```motor_effort``` interfaces
