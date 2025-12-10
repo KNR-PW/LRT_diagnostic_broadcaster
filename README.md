@@ -27,35 +27,24 @@ https://releases.ubuntu.com/jammy/
 ## Parameters 
 This broadcaster uses [generate_parameters_library](https://github.com/PickNikRobotics/generate_parameter_library) to handle parameters. You can specify which joints and interfaces you want to be broadcasted.
 
-``diagnostic_broadcaster/diagnostic_parameters.yaml``:
+## Diagnostic parameters example:
 ```rb
 diagnostic_broadcaster:
   joint_names:
-    type: string_array
-    read_only: true
-    default_value: []
-    validation:
-      unique<>: null
-    description: "Names of joints"
+    - joint_name_1
+    - joint_name_2
+    - joint_name_3
     
 
   interface_names:
-    type: string_array
-    description: "Names of diagnostic interfaces"
-    default_value: ["temperature", "fault", "motor_effort"]
-    read_only: true
-    validation:
-      subset_of<>: [["temperature", "fault", "motor_effort"]]
-      unique<>: null
-      not_empty<>: null
+    - temperature
+    - motor_effort
+    - faut
 
   interface_params:
     __map_interface_names:
       update_threshold:
-        type: double
-        default_value: 0.1
-        read_only: true
-        description: "When interface values change by this amount, it will be noticed"
+        - 0.1 
 
 ```
 > [!NOTE]
