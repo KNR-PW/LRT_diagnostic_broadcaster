@@ -46,12 +46,15 @@ diagnostic_broadcaster:
         - 0.1 
 
 ```
+### Parameters description
+- joint_names - Names of joints [string]
+- interface_names - Names of diagnostic interfaces [string]
+- interface_params - parameters mapped to interfaces 
+    - update_threshold - When interface (currently temperature and motor_effort) values change by this amount, this will be noticed [double]
+  
 > [!NOTE]
 > By specifying which joints should be broadcasted ```state_interfaces_config.type``` changes from ```controller_interface::interface_configuration_type::ALL``` to ```controller_interface::interface_configuration_type::INDIVIDUAL;```. 
 
 ```update_treshold``` parameter is currently used for setting up data update threshold for ```temperature``` and ```motor_effort``` interfaces
 
-- joint_names - Names of joints [string]
-- interface_names - Names of diagnostic interfaces [string]
-- interface_params - parameters mapped to interfaces 
-    - update_threshold - When interface (currently temperature and motor_effort) values change by this amount, this will be noticed [double]
+
