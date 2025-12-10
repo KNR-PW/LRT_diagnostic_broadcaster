@@ -53,5 +53,5 @@ diagnostic_broadcaster:
 
 - joint_names - Names of joints [string]
 - interface_names - Names of diagnostic interfaces [string]
-- interface_params 
+- interface_params - parameters mapped to interfaces 
     - update_threshold - When interface (currently temperature and motor_effort) values change by this amount, this will be noticed [double]
