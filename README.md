@@ -42,8 +42,8 @@ diagnostic_broadcaster:
     - faut
 
   interface_params:
-      update_threshold:
-        - 0.1 
+      update_threshold: 0.1 
+        
 
 ```
 ### Parameters description
