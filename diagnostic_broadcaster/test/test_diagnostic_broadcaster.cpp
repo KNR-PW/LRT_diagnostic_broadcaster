@@ -165,6 +165,37 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
 
 }
 
+TEST_F(DiagnosticBroadcasterTest, ThresholdTest)
+{
+  SetUpDiagnosticBroadcaster();
+
+  // Configure and activate controller
+  ASSERT_EQ(
+    diagnostic_broadcaster_->on_configure(rclcpp_lifecycle::State{}),
+    controller_interface::CallbackReturn::SUCCESS);
+  ASSERT_EQ(
+    diagnostic_broadcaster_->on_activate(rclcpp_lifecycle::State{}),
+    controller_interface::CallbackReturn::SUCCESS);
+
+
+  diagnostic_msgs::msg::Diagnostics diagnostic_msg;
+
+
+  // Value greater than threshold
+  temperature_values_[0] = 31.0f; 
+
+  subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
+
+  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0f);
+
+  //Value smaller than threshold
+  temperature_values_[0] = 31.05f; 
+
+  subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
+
+  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0f);
+}
+
 
 int main(int argc, char * argv[])
 {

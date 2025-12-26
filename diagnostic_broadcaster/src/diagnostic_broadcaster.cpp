@@ -227,10 +227,7 @@ namespace diagnostic_broadcaster
           previous_temp_val_[i] = temp_value_;
           realtime_publisher_->msg_.temperature[i] = temp_value_;
         }
-        else 
-        {
-          previous_temp_val_[i] = temp_value_;
-        }
+
 
         if(std::isnan(previous_meffort_val_[i]) || 
           std::abs(meffort_value_ - previous_meffort_val_[i]) > threshold)
@@ -238,10 +235,7 @@ namespace diagnostic_broadcaster
           previous_meffort_val_[i] = meffort_value_;
           realtime_publisher_->msg_.motor_effort[i] = meffort_value_;
         }
-        else 
-        {
-          previous_meffort_val_[i] = meffort_value_;
-        }
+
 
         realtime_publisher_->msg_.fault[i] = fault_value_;
 
