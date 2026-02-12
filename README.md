@@ -31,20 +31,20 @@ This broadcaster uses [generate_parameters_library](https://github.com/PickNikRo
 ```rb
 diagnostic_broadcaster:
   joint_names:
-    - joint_name_1
-    - joint_name_2
-    - joint_name_3
-    
+    - "joint_name_1"
+    - "joint_name_2"
+    - "joint_name_3"
 
   interface_names:
-    - temperature
-    - motor_effort
-    - faut
+    - "temperature"
+    - "motor_effort"
+    - "fault"
 
   interface_params:
-      update_threshold: 0.1 
-        
-
+    temperature:
+      update_threshold: 0.1
+    motor_effort:
+      update_threshold: 0.1
 ```
 ### Parameters description
 - joint_names - Names of joints [string]

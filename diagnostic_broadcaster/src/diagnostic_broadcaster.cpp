@@ -213,7 +213,8 @@ namespace diagnostic_broadcaster
 
       realtime_publisher_->msg_.joints = joint_names_;
 
-      double threshold = params_.interface_params.interface_names_map["update_threshold"].update_threshold;
+      double temperature_threshold = params_.interface_params.interface_names_map["temperature"].update_threshold;
+      double motor_effort_treshold = params_.interface_params.interface_names_map["motor_effort"].update_threshold;
 
       for(int i = 0; i < joint_num_; i++)
       {
@@ -222,7 +223,7 @@ namespace diagnostic_broadcaster
         int8_t fault_value_ = static_cast<int>(fault_interfaces_[i].get().get_value());
 
         if(std::isnan(previous_temp_val_[i]) || 
-          std::abs(temp_value_ - previous_temp_val_[i]) > threshold)
+          std::abs(temp_value_ - previous_temp_val_[i]) > temperature_threshold)
         {
           previous_temp_val_[i] = temp_value_;
           realtime_publisher_->msg_.temperature[i] = temp_value_;
@@ -230,7 +231,7 @@ namespace diagnostic_broadcaster
 
 
         if(std::isnan(previous_meffort_val_[i]) || 
-          std::abs(meffort_value_ - previous_meffort_val_[i]) > threshold)
+          std::abs(meffort_value_ - previous_meffort_val_[i]) > motor_effort_treshold)
         {
           previous_meffort_val_[i] = meffort_value_;
           realtime_publisher_->msg_.motor_effort[i] = meffort_value_;
