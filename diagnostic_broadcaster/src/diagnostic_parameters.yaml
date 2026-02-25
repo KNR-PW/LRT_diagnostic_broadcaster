@@ -11,10 +11,37 @@ diagnostic_broadcaster:
   interface_names:
     type: string_array
     description: "Names of diagnostic interfaces"
-    default_value: ["temperature", "fault", "motor_effort"]
+    default_value: [
+      "temperature", 
+      "fault", 
+      "motor_effort", 
+      "motor_position", 
+      "motor_desired_position", 
+      "motor_position_error", 
+      "motor_velocity", 
+      "motor_desired_velocity", 
+      "motor_velocity_error",
+      "motor_desired_torque",
+      "power",
+      "current",
+      "voltage"]
     read_only: true
     validation:
-      subset_of<>: [["temperature", "fault", "motor_effort"]]
+      subset_of<>: [[
+        "temperature",
+        "fault",
+        "motor_effort",
+        "motor_position", 
+        "motor_desired_position", 
+        "motor_position_error", 
+        "motor_velocity", 
+        "motor_desired_velocity", 
+        "motor_velocity_error",
+        "motor_desired_torque",
+        "power",
+        "current",
+        "voltage"
+           ]]
       unique<>: null
       not_empty<>: null
 

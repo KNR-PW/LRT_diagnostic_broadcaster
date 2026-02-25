@@ -78,6 +78,38 @@ namespace diagnostic_broadcaster
         loaned_state_interfaces_t meffort_interfaces_;
         std::vector<double> previous_meffort_val_;
         
+        loaned_state_interfaces_t mposition_interfaces_;
+        std::vector<double> previous_mposition_val_;
+
+        loaned_state_interfaces_t mdesired_position_interfaces_;
+        std::vector<double> previous_mdesired_position_val_;
+
+        loaned_state_interfaces_t mposition_error_interfaces_;
+        std::vector<double> previous_mposition_error_val_;
+        
+        loaned_state_interfaces_t mvelocity_interfaces_;
+        std::vector<double> previous_mvelocity_val_;
+
+        loaned_state_interfaces_t mdesired_velocity_interfaces_;
+        std::vector<double> previous_mdesired_velocity_val_;
+
+        loaned_state_interfaces_t mvelocity_error_interfaces_;
+        std::vector<double> previous_mvelocity_error_val_;
+
+        loaned_state_interfaces_t mdesired_torque_interfaces_;
+        std::vector<double> previous_mdesired_torque_val_;
+
+        loaned_state_interfaces_t power_interfaces_;
+        std::vector<double> previous_power_val_;
+
+        loaned_state_interfaces_t current_interfaces_;
+        std::vector<double> previous_current_val_;
+
+        loaned_state_interfaces_t voltage_interfaces_;
+        std::vector<double> previous_voltage_val_;
+        
+
+
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 

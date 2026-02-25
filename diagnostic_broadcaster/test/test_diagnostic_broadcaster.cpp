@@ -23,20 +23,39 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     node->declare_parameter<std::vector<std::string>>(
         "diagnostic_broadcaster.joint_names", std::vector<std::string>{});
     node->declare_parameter<std::vector<std::string>>(
-        "diagnostic_broadcaster.interface_names", std::vector<std::string>{"temperature", "fault"});
+        "diagnostic_broadcaster.interface_names", std::vector<std::string>{
+          "temperature",
+          "fault", 
+          "motor_effort", 
+          "motor_position", 
+          "motor_desired_position", 
+          "motor_position_error", 
+          "motor_velocity", 
+          "motor_desired_velocity", 
+          "motor_velocity_error", 
+          "motor_desired_torque", 
+          "power", 
+          "current", 
+          "voltage"});
     node->declare_parameter<double>(
         "diagnostic_broadcaster.interface_params.__map_interface_names.update_threshold", 0.1);
 
     diagnostic_broadcaster_->init("test_diagnostic_broadcaster", "", rclcpp::NodeOptions());
 
     std::vector<LoanedStateInterface> state_interfaces;
-    state_interfaces.emplace_back(interface_1);
-    state_interfaces.emplace_back(interface_2);
-    state_interfaces.emplace_back(interface_3);
-    state_interfaces.emplace_back(interface_4);
-    state_interfaces.emplace_back(interface_5);
-    state_interfaces.emplace_back(interface_6);
-    state_interfaces.emplace_back(interface_7);
+    state_interfaces.emplace_back(temperature_interface_1);
+    state_interfaces.emplace_back(fault_interface_1);
+    state_interfaces.emplace_back(motor_effort_interface_1);
+    state_interfaces.emplace_back(mposition_interface_1);
+    state_interfaces.emplace_back(mdesired_position_interface_1);
+    state_interfaces.emplace_back(mposition_error_interface_1);
+    state_interfaces.emplace_back(mvelocity_interface_1);
+    state_interfaces.emplace_back(mdesired_velocity_interface_1);
+    state_interfaces.emplace_back(mvelocity_error_interface_1);
+    state_interfaces.emplace_back(mdesired_torque_interface_1);
+    state_interfaces.emplace_back(power_interface_1);
+    state_interfaces.emplace_back(current_interface_1);
+    state_interfaces.emplace_back(voltage_interface_1);
 
     EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
 
@@ -145,14 +164,14 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
-  EXPECT_EQ(diagnostic_msg.joints.size(), 2lu);
+  EXPECT_EQ(diagnostic_msg.names.size(), 2lu);
 
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
-  EXPECT_EQ(diagnostic_msg.joints[0], "test_joint1");
-  EXPECT_EQ(diagnostic_msg.joints[1], "test_joint2");
+  EXPECT_EQ(diagnostic_msg.names[0], "test_joint1");
+  EXPECT_EQ(diagnostic_msg.names[1], "test_joint2");
 
-  EXPECT_EQ(diagnostic_msg.temperature[0], temperature_values_[0]);
-  EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[2]);
+  EXPECT_EQ(diagnostic_msg.temperature[0], example_values_[0]);
+  EXPECT_EQ(diagnostic_msg.temperature[1], example_values_[2]);
   
   int8_t expected = 1;
   EXPECT_EQ(diagnostic_msg.fault[0], expected);
@@ -182,14 +201,14 @@ TEST_F(DiagnosticBroadcasterTest, ThresholdTest)
 
 
   // Value greater than threshold
-  temperature_values_[0] = 31.0f; 
+  example_values_[0] = 31.0f; 
 
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   EXPECT_EQ(diagnostic_msg.temperature[0], 31.0f);
 
   //Value smaller than threshold
-  temperature_values_[0] = 31.05f; 
+  example_values_[0] = 31.05f; 
 
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
