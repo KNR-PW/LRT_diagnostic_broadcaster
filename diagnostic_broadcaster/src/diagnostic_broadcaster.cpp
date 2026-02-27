@@ -260,10 +260,32 @@ namespace diagnostic_broadcaster
     {
       realtime_publisher_->msg_.header.stamp = time;
 
-      if (temperature_interfaces_.size() != fault_interfaces_.size() && temperature_interfaces_.size() != meffort_interfaces_.size()) {
-        RCLCPP_ERROR(get_node()->get_logger(), "Interfaces size mismatch!");
-        return controller_interface::return_type::ERROR;
-      }
+
+      // debug log for joint names
+  //   std::vector<std::pair<std::string, size_t>> interface_sizes = {
+  //     {"temperature", temperature_interfaces_.size()},
+  //     {"fault", fault_interfaces_.size()},
+  //     {"motor_effort", meffort_interfaces_.size()},
+  //     {"motor_position", mposition_interfaces_.size()},
+  //     {"motor_desired_position", mdesired_position_interfaces_.size()},
+  //     {"motor_position_error", mposition_error_interfaces_.size()},
+  //     {"motor_velocity", mvelocity_interfaces_.size()},
+  //     {"motor_desired_velocity", mdesired_velocity_interfaces_.size()},
+  //     {"motor_velocity_error", mvelocity_error_interfaces_.size()},
+  //     {"motor_desired_torque", mdesired_torque_interfaces_.size()},
+  //     {"power", power_interfaces_.size()},
+  //     {"current", current_interfaces_.size()},
+  //     {"voltage", voltage_interfaces_.size()}
+  //   };
+
+  // for (const auto& [name, size] : interface_sizes) {
+  //   if (size != static_cast<size_t>(joint_num_)) {
+  //     RCLCPP_ERROR(get_node()->get_logger(), 
+  //       "Interface size mismatch! Container '%s' has size %zu, but expected %d.", 
+  //       name.c_str(), size, joint_num_);
+  //     return controller_interface::return_type::ERROR;
+  //   }
+  // }
 
       realtime_publisher_->msg_.names = joint_names_;
 
