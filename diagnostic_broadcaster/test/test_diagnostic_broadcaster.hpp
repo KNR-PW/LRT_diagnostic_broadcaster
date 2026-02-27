@@ -53,10 +53,21 @@ protected:
   //joint2
   hardware_interface::StateInterface temperature_interface_2{"test_joint2", "temperature", &example_values_[2]};
   hardware_interface::StateInterface fault_interface_2{"test_joint2", "fault", &fault};
-  hardware_interface::StateInterface motor_effort_interface_2{"test_joint2", "motor_effort", &example_values_[4]};
+  hardware_interface::StateInterface motor_effort_interface_2{"test_joint2", "motor_effort", &example_values_[6]};
+  hardware_interface::StateInterface mposition_interface_2{"test_joint2", "motor_position", &example_values_[8]};
+  hardware_interface::StateInterface mdesired_position_interface_2{"test_joint2", "motor_desired_position", &example_values_[0]};
+  hardware_interface::StateInterface mposition_error_interface_2{"test_joint2", "motor_position_error", &example_values_[2]};
+  hardware_interface::StateInterface mvelocity_interface_2{"test_joint2", "motor_velocity", &example_values_[4]};
+  hardware_interface::StateInterface mdesired_velocity_interface_2{"test_joint2", "motor_desired_velocity", &example_values_[6]};
+  hardware_interface::StateInterface mvelocity_error_interface_2{"test_joint2", "motor_velocity_error", &example_values_[8]};
+  hardware_interface::StateInterface mdesired_torque_interface_2{"test_joint2", "motor_desired_torque", &example_values_[0]};
+  hardware_interface::StateInterface power_interface_2{"test_joint2", "power", &example_values_[2]};
+  hardware_interface::StateInterface current_interface_2{"test_joint2", "current", &example_values_[4]};
+  hardware_interface::StateInterface voltage_interface_2{"test_joint2", "voltage", &example_values_[6]};
+  hardware_interface::StateInterface pressure_interface_2{"test_joint2", "pressure", &example_values_[8]};
 
   //joint3
-  hardware_interface::StateInterface pressure_interface_3{"test_joint3", "pressure", &example_values_[4]};
+  hardware_interface::StateInterface pressure_interface_3{"test_joint3", "pressure", &example_values_[6]};
 
 
   std::unique_ptr<FriendDiagnosticBroadcasterTest> diagnostic_broadcaster_;
