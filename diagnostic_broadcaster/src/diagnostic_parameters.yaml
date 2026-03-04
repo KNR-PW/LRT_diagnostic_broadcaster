@@ -21,10 +21,15 @@ diagnostic_broadcaster:
       "motor_velocity", 
       "motor_desired_velocity", 
       "motor_velocity_error",
-      "motor_desired_torque",
+      "motor_desired_effort",
       "power",
       "current",
-      "voltage"]
+      "voltage",
+      "desired_position",
+      "position_error",
+      "desired_velocity",
+      "velocity_error",
+      "desired_effort"]
     read_only: true
     validation:
       subset_of<>: [[
@@ -37,10 +42,15 @@ diagnostic_broadcaster:
         "motor_velocity", 
         "motor_desired_velocity", 
         "motor_velocity_error",
-        "motor_desired_torque",
+        "motor_desired_effort",
         "power",
         "current",
-        "voltage"
+        "voltage",
+        "desired_position",
+        "position_error",
+        "desired_velocity",
+        "velocity_error",
+        "desired_effort"
            ]]
       unique<>: null
       not_empty<>: null

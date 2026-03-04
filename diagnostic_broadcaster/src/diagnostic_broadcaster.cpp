@@ -39,6 +39,20 @@ namespace diagnostic_broadcaster
 
     previous_temp_val_.clear();
     previous_meffort_val_.clear();
+    previous_mdesired_position_val_.clear();
+    previous_mposition_error_val_.clear();
+    previous_mvelocity_val_.clear();
+    previous_mdesired_velocity_val_.clear();
+    previous_mvelocity_error_val_.clear();
+    previous_mdesired_effort_val_.clear();
+    previous_power_val_.clear();
+    previous_current_val_.clear();
+    previous_voltage_val_.clear();
+    previous_position_error_val_.clear();
+    previous_velocity_error_val_.clear();
+    previous_desired_position_val_.clear();
+    previous_desired_velocity_val_.clear();
+    previous_desired_effort_val_.clear();
 
     return controller_interface::CallbackReturn::SUCCESS;
   }
@@ -140,6 +154,22 @@ namespace diagnostic_broadcaster
     temperature_interfaces_.clear();
     fault_interfaces_.clear();
     meffort_interfaces_.clear();
+    mposition_interfaces_.clear();
+    mdesired_position_interfaces_.clear();
+    mposition_error_interfaces_.clear();
+    mvelocity_interfaces_.clear();
+    mdesired_velocity_interfaces_.clear();
+    mvelocity_error_interfaces_.clear();
+    mdesired_effort_interfaces_.clear();
+    power_interfaces_.clear();
+    current_interfaces_.clear();
+    voltage_interfaces_.clear();
+
+    desired_position_interfaces_.clear();
+    position_error_interfaces_.clear();
+    desired_velocity_interfaces_.clear();
+    velocity_error_interfaces_.clear();
+    desired_effort_interfaces_.clear();
 
     if (state_interfaces_.empty())
     {
@@ -164,6 +194,22 @@ namespace diagnostic_broadcaster
     temperature_interfaces_.reserve(joint_num_);
     fault_interfaces_.reserve(joint_num_);
     meffort_interfaces_.reserve(joint_num_);
+    mposition_interfaces_.reserve(joint_num_);
+    mdesired_position_interfaces_.reserve(joint_num_);
+    mposition_error_interfaces_.reserve(joint_num_);
+    mvelocity_interfaces_.reserve(joint_num_);
+    mdesired_velocity_interfaces_.reserve(joint_num_);
+    mvelocity_error_interfaces_.reserve(joint_num_);
+    mdesired_effort_interfaces_.reserve(joint_num_);
+    power_interfaces_.reserve(joint_num_);
+    current_interfaces_.reserve(joint_num_);
+    voltage_interfaces_.reserve(joint_num_);
+
+    desired_position_interfaces_.reserve(joint_num_);
+    position_error_interfaces_.reserve(joint_num_);
+    desired_velocity_interfaces_.reserve(joint_num_);
+    velocity_error_interfaces_.reserve(joint_num_);
+    desired_effort_interfaces_.reserve(joint_num_);
 
     for (const auto & joint_name : joint_names_)
     {
@@ -189,14 +235,25 @@ namespace diagnostic_broadcaster
             mdesired_velocity_interfaces_.push_back(iface);
           else if (iface.get_interface_name() == "motor_velocity_error")
             mvelocity_error_interfaces_.push_back(iface);
-          else if (iface.get_interface_name() == "motor_desired_torque")
-            mdesired_torque_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "motor_desired_effort")
+            mdesired_effort_interfaces_.push_back(iface);
           else if (iface.get_interface_name() == "power")
             power_interfaces_.push_back(iface);
           else if (iface.get_interface_name() == "current")
             current_interfaces_.push_back(iface);
           else if (iface.get_interface_name() == "voltage")
             voltage_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "desired_position")
+            desired_position_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "position_error")
+            position_error_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "desired_velocity")
+            desired_velocity_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "velocity_error")
+            velocity_error_interfaces_.push_back(iface);
+          else if (iface.get_interface_name() == "desired_effort")
+            desired_effort_interfaces_.push_back(iface);
+          
             
         }
      }
@@ -237,8 +294,8 @@ namespace diagnostic_broadcaster
     realtime_publisher_msg.motor_velocity_error.resize(joint_num_, k_uninitialized_value_);
     previous_mvelocity_error_val_.resize(joint_num_, k_uninitialized_value_);
 
-    realtime_publisher_msg.motor_desired_torque.resize(joint_num_, k_uninitialized_value_);
-    previous_mdesired_torque_val_.resize(joint_num_, k_uninitialized_value_);
+    realtime_publisher_msg.motor_desired_effort.resize(joint_num_, k_uninitialized_value_);
+    previous_mdesired_effort_val_.resize(joint_num_, k_uninitialized_value_);
 
     realtime_publisher_msg.power.resize(joint_num_, k_uninitialized_value_);
     previous_power_val_.resize(joint_num_, k_uninitialized_value_);
@@ -248,6 +305,23 @@ namespace diagnostic_broadcaster
 
     realtime_publisher_msg.voltage.resize(joint_num_, k_uninitialized_value_);
     previous_voltage_val_.resize(joint_num_, k_uninitialized_value_);
+
+    realtime_publisher_msg.desired_position.resize(joint_num_, k_uninitialized_value_);
+    previous_desired_position_val_.resize(joint_num_, k_uninitialized_value_);
+
+    realtime_publisher_msg.position_error.resize(joint_num_, k_uninitialized_value_);
+    previous_position_error_val_.resize(joint_num_, k_uninitialized_value_);
+
+    realtime_publisher_msg.desired_velocity.resize(joint_num_, k_uninitialized_value_);
+    previous_desired_velocity_val_.resize(joint_num_, k_uninitialized_value_);
+
+    realtime_publisher_msg.velocity_error.resize(joint_num_, k_uninitialized_value_);
+    previous_velocity_error_val_.resize(joint_num_, k_uninitialized_value_);
+
+    realtime_publisher_msg.desired_effort.resize(joint_num_, k_uninitialized_value_);
+    previous_desired_effort_val_.resize(joint_num_, k_uninitialized_value_);
+
+
 
 
     // @note ADD NEW LINE FOR NEW INTERFACES (realtime_publisher_msg.<new>.resize(num_joints, k_uninitialized_value);
@@ -272,10 +346,15 @@ namespace diagnostic_broadcaster
       {"motor_velocity", mvelocity_interfaces_.size()},
       {"motor_desired_velocity", mdesired_velocity_interfaces_.size()},
       {"motor_velocity_error", mvelocity_error_interfaces_.size()},
-      {"motor_desired_torque", mdesired_torque_interfaces_.size()},
+      {"motor_desired_effort", mdesired_effort_interfaces_.size()},
       {"power", power_interfaces_.size()},
       {"current", current_interfaces_.size()},
-      {"voltage", voltage_interfaces_.size()}
+      {"voltage", voltage_interfaces_.size()},
+      {"desired_position", desired_position_interfaces_.size()},
+      {"position_error", position_error_interfaces_.size()},
+      {"desired_velocity", desired_velocity_interfaces_.size()},
+      {"velocity_error", velocity_error_interfaces_.size()},
+      {"desired_effort", desired_effort_interfaces_.size()}
     };
 
   for (const auto& [name, size] : interface_sizes) {
@@ -297,10 +376,16 @@ namespace diagnostic_broadcaster
       double motor_velocity_threshold = params_.interface_params.interface_names_map["motor_velocity"].update_threshold;
       double motor_desired_velocity_threshold = params_.interface_params.interface_names_map["motor_desired_velocity"].update_threshold;
       double motor_velocity_error_threshold = params_.interface_params.interface_names_map["motor_velocity_error"].update_threshold;
-      double motor_desired_torque_threshold = params_.interface_params.interface_names_map["motor_desired_torque"].update_threshold;
+      double motor_desired_effort_threshold = params_.interface_params.interface_names_map["motor_desired_effort"].update_threshold;
       double power_threshold = params_.interface_params.interface_names_map["power"].update_threshold;
       double current_threshold = params_.interface_params.interface_names_map["current"].update_threshold;
       double voltage_threshold = params_.interface_params.interface_names_map["voltage"].update_threshold;
+
+      double desired_position_threshold = params_.interface_params.interface_names_map["desired_position"].update_threshold;
+      double position_error_threshold = params_.interface_params.interface_names_map["position_error"].update_threshold;
+      double desired_velocity_threshold = params_.interface_params.interface_names_map["desired_velocity"].update_threshold;
+      double velocity_error_threshold = params_.interface_params.interface_names_map["velocity_error"].update_threshold;
+      double desired_effort_threshold = params_.interface_params.interface_names_map["desired_effort"].update_threshold;
 
 
       for(int i = 0; i < joint_num_; i++)
@@ -318,11 +403,17 @@ namespace diagnostic_broadcaster
         double mdesired_velocity_value_ = mdesired_velocity_interfaces_[i].get().get_value();
         double mvelocity_error_value_ = mvelocity_error_interfaces_[i].get().get_value();
 
-        double mdesired_torque_value_ = mdesired_torque_interfaces_[i].get().get_value();
+        double mdesired_effort_value_ = mdesired_effort_interfaces_[i].get().get_value();
 
         double power_value_ = power_interfaces_[i].get().get_value();
         double current_value_ = current_interfaces_[i].get().get_value();
         double voltage_value_ = voltage_interfaces_[i].get().get_value();
+
+        double desired_position_value_ = desired_position_interfaces_[i].get().get_value();
+        double position_error_value_ = position_error_interfaces_[i].get().get_value();
+        double desired_velocity_value_ = desired_velocity_interfaces_[i].get().get_value();
+        double velocity_error_value_ = velocity_error_interfaces_[i].get().get_value();
+        double desired_effort_value_ = desired_effort_interfaces_[i].get().get_value();
 
         if(std::isnan(previous_temp_val_[i]) || 
           std::abs(temp_value_ - previous_temp_val_[i]) > temperature_threshold)
@@ -380,11 +471,11 @@ namespace diagnostic_broadcaster
           realtime_publisher_->msg_.motor_velocity_error[i] = mvelocity_error_value_;
         }
 
-        if(std::isnan(previous_mdesired_torque_val_[i]) || 
-          std::abs(mdesired_torque_value_ - previous_mdesired_torque_val_[i]) > motor_desired_torque_threshold)
+        if(std::isnan(previous_mdesired_effort_val_[i]) || 
+          std::abs(mdesired_effort_value_ - previous_mdesired_effort_val_[i]) > motor_desired_effort_threshold)
         {
-          previous_mdesired_torque_val_[i] = mdesired_torque_value_;
-          realtime_publisher_->msg_.motor_desired_torque[i] = mdesired_torque_value_;
+          previous_mdesired_effort_val_[i] = mdesired_effort_value_;
+          realtime_publisher_->msg_.motor_desired_effort[i] = mdesired_effort_value_;
         }
 
         if(std::isnan(previous_power_val_[i]) || 
@@ -409,6 +500,43 @@ namespace diagnostic_broadcaster
         }
 
         realtime_publisher_->msg_.fault[i] = fault_value_;
+
+        if(std::isnan(previous_desired_position_val_[i]) || 
+          std::abs(desired_position_value_ - previous_desired_position_val_[i]) > desired_position_threshold)
+        {
+          previous_desired_position_val_[i] = desired_position_value_;
+          realtime_publisher_->msg_.desired_position[i] = desired_position_value_;
+        }
+
+        if(std::isnan(previous_position_error_val_[i]) || 
+          std::abs(position_error_value_ - previous_position_error_val_[i]) > position_error_threshold)
+        {
+          previous_position_error_val_[i] = position_error_value_;
+          realtime_publisher_->msg_.position_error[i] = position_error_value_;
+        }
+
+        if(std::isnan(previous_desired_velocity_val_[i]) || 
+          std::abs(desired_velocity_value_ - previous_desired_velocity_val_[i]) > desired_velocity_threshold)
+        {
+          previous_desired_velocity_val_[i] = desired_velocity_value_;
+          realtime_publisher_->msg_.desired_velocity[i] = desired_velocity_value_;
+        }
+
+        if(std::isnan(previous_velocity_error_val_[i]) || 
+          std::abs(velocity_error_value_ - previous_velocity_error_val_[i]) > velocity_error_threshold)
+        {
+          previous_velocity_error_val_[i] = velocity_error_value_;
+          realtime_publisher_->msg_.velocity_error[i] = velocity_error_value_;
+        }
+
+        if(std::isnan(previous_desired_effort_val_[i]) || 
+          std::abs(desired_effort_value_ - previous_desired_effort_val_[i]) > desired_effort_threshold)
+        {
+          previous_desired_effort_val_[i] = desired_effort_value_;
+          realtime_publisher_->msg_.desired_effort[i] = desired_effort_value_;
+        }
+
+        
 
         // @note ADD NEW IF FOR NEW INTERFACES
       }

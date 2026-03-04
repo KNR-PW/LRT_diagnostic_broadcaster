@@ -33,10 +33,16 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
           "motor_velocity", 
           "motor_desired_velocity", 
           "motor_velocity_error", 
-          "motor_desired_torque", 
+          "motor_desired_effort", 
           "power", 
           "current", 
-          "voltage"});
+          "voltage",
+          "desired_position",
+          "position_error",
+          "desired_velocity",
+          "velocity_error",
+          "desired_effort"
+        });
     node->declare_parameter<double>(
         "diagnostic_broadcaster.interface_params.__map_interface_names.update_threshold", 0.1);
 
@@ -52,10 +58,16 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     state_interfaces.emplace_back(mvelocity_interface_1);
     state_interfaces.emplace_back(mdesired_velocity_interface_1);
     state_interfaces.emplace_back(mvelocity_error_interface_1);
-    state_interfaces.emplace_back(mdesired_torque_interface_1);
+    state_interfaces.emplace_back(mdesired_effort_interface_1);
     state_interfaces.emplace_back(power_interface_1);
     state_interfaces.emplace_back(current_interface_1);
     state_interfaces.emplace_back(voltage_interface_1);
+
+    state_interfaces.emplace_back(desired_position_interface_1);
+    state_interfaces.emplace_back(position_error_interface_1);
+    state_interfaces.emplace_back(desired_velocity_interface_1);
+    state_interfaces.emplace_back(velocity_error_interface_1);
+    state_interfaces.emplace_back(desired_effort_interface_1);
 
     state_interfaces.emplace_back(temperature_interface_2);
     state_interfaces.emplace_back(fault_interface_2);
@@ -66,10 +78,16 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     state_interfaces.emplace_back(mvelocity_interface_2);
     state_interfaces.emplace_back(mdesired_velocity_interface_2);
     state_interfaces.emplace_back(mvelocity_error_interface_2);
-    state_interfaces.emplace_back(mdesired_torque_interface_2);
+    state_interfaces.emplace_back(mdesired_effort_interface_2);
     state_interfaces.emplace_back(power_interface_2);
     state_interfaces.emplace_back(current_interface_2);
     state_interfaces.emplace_back(voltage_interface_2);
+
+    state_interfaces.emplace_back(desired_position_interface_2);
+    state_interfaces.emplace_back(position_error_interface_2);
+    state_interfaces.emplace_back(desired_velocity_interface_2);
+    state_interfaces.emplace_back(velocity_error_interface_2);
+    state_interfaces.emplace_back(desired_effort_interface_2);
 
 
     state_interfaces.emplace_back(pressure_interface_3);
@@ -101,7 +119,7 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
     state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
   
 
-  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 27lu);
+  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 37lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
@@ -121,7 +139,7 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 27lu);
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 37lu);
   }
 
   ASSERT_EQ(
@@ -215,8 +233,8 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   EXPECT_EQ(diagnostic_msg.motor_velocity_error[0], example_values_[6]);
   EXPECT_EQ(diagnostic_msg.motor_velocity_error[1], example_values_[8]);
 
-  EXPECT_EQ(diagnostic_msg.motor_desired_torque[0], example_values_[8]);
-  EXPECT_EQ(diagnostic_msg.motor_desired_torque[1], example_values_[0]);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[0], example_values_[8]);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], example_values_[0]);
 
   EXPECT_EQ(diagnostic_msg.power[0], example_values_[0]);
   EXPECT_EQ(diagnostic_msg.power[1], example_values_[2]);
@@ -251,7 +269,7 @@ TEST_F(DiagnosticBroadcasterTest, ThresholdTest)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   EXPECT_EQ(diagnostic_msg.temperature[0], 31.0);
-  EXPECT_EQ(diagnostic_msg.motor_desired_torque[1], 31.0);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], 31.0);
 
   //Value smaller than threshold
   example_values_[0] += 0.05; 
@@ -259,7 +277,7 @@ TEST_F(DiagnosticBroadcasterTest, ThresholdTest)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   EXPECT_EQ(diagnostic_msg.temperature[0], 31.0);
-  EXPECT_EQ(diagnostic_msg.motor_desired_torque[1], 31.0);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], 31.0);
 }
 
 
