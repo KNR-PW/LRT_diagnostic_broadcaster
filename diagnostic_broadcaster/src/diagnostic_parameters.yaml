@@ -29,7 +29,8 @@ diagnostic_broadcaster:
       "position_error",
       "desired_velocity",
       "velocity_error",
-      "desired_effort"]
+      "desired_effort",
+      mode]
     read_only: true
     validation:
       subset_of<>: [[
@@ -50,7 +51,8 @@ diagnostic_broadcaster:
         "position_error",
         "desired_velocity",
         "velocity_error",
-        "desired_effort"
+        "desired_effort",
+        "mode"
            ]]
       unique<>: null
       not_empty<>: null

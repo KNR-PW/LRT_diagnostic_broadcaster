@@ -125,6 +125,8 @@ namespace diagnostic_broadcaster
         loaned_state_interfaces_t desired_effort_interfaces_;
         std::vector<double> previous_desired_effort_val_;
 
+        loaned_state_interfaces_t mode_interfaces_;
+
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 

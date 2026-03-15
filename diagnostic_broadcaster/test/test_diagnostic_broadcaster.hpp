@@ -56,6 +56,8 @@ protected:
   hardware_interface::StateInterface velocity_error_interface_1{"test_joint1", "velocity_error", &example_values_[2]};
   hardware_interface::StateInterface desired_effort_interface_1{"test_joint1", "desired_effort", &example_values_[4]};
 
+  hardware_interface::StateInterface mode_interface_1{"test_joint1", "mode", &fault};
+
   //joint2
   hardware_interface::StateInterface temperature_interface_2{"test_joint2", "temperature", &example_values_[2]};
   hardware_interface::StateInterface fault_interface_2{"test_joint2", "fault", &fault};
@@ -77,6 +79,8 @@ protected:
   hardware_interface::StateInterface desired_velocity_interface_2{"test_joint2", "desired_velocity", &example_values_[4]};
   hardware_interface::StateInterface velocity_error_interface_2{"test_joint2", "velocity_error", &example_values_[6]};
   hardware_interface::StateInterface desired_effort_interface_2{"test_joint2", "desired_effort", &example_values_[8]};
+
+  hardware_interface::StateInterface mode_interface_2{"test_joint1", "mode", &fault};
 
   //joint3
   hardware_interface::StateInterface pressure_interface_3{"test_joint3", "pressure", &example_values_[6]};

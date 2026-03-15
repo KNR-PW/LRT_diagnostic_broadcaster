@@ -29,3 +29,4 @@ float64[] velocity_error
 
 float64[] desired_effort
 
+int8[] mode

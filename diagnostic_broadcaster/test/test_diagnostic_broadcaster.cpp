@@ -69,6 +69,8 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     state_interfaces.emplace_back(velocity_error_interface_1);
     state_interfaces.emplace_back(desired_effort_interface_1);
 
+    state_interfaces.emplace_back(mode_interface_1);
+
     state_interfaces.emplace_back(temperature_interface_2);
     state_interfaces.emplace_back(fault_interface_2);
     state_interfaces.emplace_back(motor_effort_interface_2);
@@ -88,6 +90,8 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     state_interfaces.emplace_back(desired_velocity_interface_2);
     state_interfaces.emplace_back(velocity_error_interface_2);
     state_interfaces.emplace_back(desired_effort_interface_2);
+
+    state_interfaces.emplace_back(mode_interface_2);
 
 
     state_interfaces.emplace_back(pressure_interface_3);
@@ -119,7 +123,7 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
     state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
   
 
-  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 37lu);
+  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 39lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
@@ -139,7 +143,7 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 37lu);
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 39lu);
   }
 
   ASSERT_EQ(
@@ -244,6 +248,8 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
 
   EXPECT_EQ(diagnostic_msg.voltage[0], example_values_[4]);
   EXPECT_EQ(diagnostic_msg.voltage[1], example_values_[6]);
+
+  EXPECT_EQ(diagnostic_msg.mode[0], fault);
 
 }
 

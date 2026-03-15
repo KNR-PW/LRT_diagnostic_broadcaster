@@ -171,6 +171,8 @@ namespace diagnostic_broadcaster
     velocity_error_interfaces_.clear();
     desired_effort_interfaces_.clear();
 
+    mode_interfaces_.clear();
+
     if (state_interfaces_.empty())
     {
       return false;
@@ -210,6 +212,8 @@ namespace diagnostic_broadcaster
     desired_velocity_interfaces_.reserve(joint_num_);
     velocity_error_interfaces_.reserve(joint_num_);
     desired_effort_interfaces_.reserve(joint_num_);
+
+    mode_interfaces_.reserve(joint_num_);
 
     for (const auto & joint_name : joint_names_)
     {
@@ -253,7 +257,8 @@ namespace diagnostic_broadcaster
             velocity_error_interfaces_.push_back(iface);
           else if (iface.get_interface_name() == "desired_effort")
             desired_effort_interfaces_.push_back(iface);
-          
+          else if (iface.get_interface_name() == "mode")
+            mode_interfaces_.push_back(iface);
             
         }
      }
@@ -321,6 +326,8 @@ namespace diagnostic_broadcaster
     realtime_publisher_msg.desired_effort.resize(joint_num_, k_uninitialized_value_);
     previous_desired_effort_val_.resize(joint_num_, k_uninitialized_value_);
 
+    realtime_publisher_msg.mode.resize(joint_num_, -1);
+
 
 
 
@@ -354,7 +361,8 @@ namespace diagnostic_broadcaster
       {"position_error", position_error_interfaces_.size()},
       {"desired_velocity", desired_velocity_interfaces_.size()},
       {"velocity_error", velocity_error_interfaces_.size()},
-      {"desired_effort", desired_effort_interfaces_.size()}
+      {"desired_effort", desired_effort_interfaces_.size()},
+      {"mode", mode_interfaces_.size()}
     };
 
   for (const auto& [name, size] : interface_sizes) {
@@ -414,6 +422,8 @@ namespace diagnostic_broadcaster
         double desired_velocity_value_ = desired_velocity_interfaces_[i].get().get_value();
         double velocity_error_value_ = velocity_error_interfaces_[i].get().get_value();
         double desired_effort_value_ = desired_effort_interfaces_[i].get().get_value();
+
+        int8_t mode_value_ = static_cast<int>(mode_interfaces_[i].get().get_value());
 
         if(std::isnan(previous_temp_val_[i]) || 
           std::abs(temp_value_ - previous_temp_val_[i]) > temperature_threshold)
@@ -535,6 +545,8 @@ namespace diagnostic_broadcaster
           previous_desired_effort_val_[i] = desired_effort_value_;
           realtime_publisher_->msg_.desired_effort[i] = desired_effort_value_;
         }
+
+        realtime_publisher_->msg_.mode[i] = mode_value_;
 
         
 
