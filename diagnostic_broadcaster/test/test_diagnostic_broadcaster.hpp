@@ -30,25 +30,62 @@ public:
   const std::vector<hardware_interface::LoanedStateInterface>  &get_state_interfaces() const;
   
 protected:
-  std::array<double, 5> temperature_values_ = {
-    {30.0, 50.0, 20.0, 25.56034, 100.0}};
+  std::array<double, 10> example_values_ = {0.0, 0.1, 20.0, 20.1, 30.0, 30.1, 40.0, 40.1, 50.0, 50.1};
   
   double fault = 1.0;
-  double motor_effort = 2.0;
+  
+  //joint1
+  hardware_interface::StateInterface temperature_interface_1{"test_joint1", "temperature", &example_values_[0]};
+  hardware_interface::StateInterface fault_interface_1{"test_joint1", "fault", &fault};
+  hardware_interface::StateInterface motor_effort_interface_1{"test_joint1", "motor_effort", &example_values_[4]};
+  hardware_interface::StateInterface mposition_interface_1{"test_joint1", "motor_position", &example_values_[6]};
+  hardware_interface::StateInterface mdesired_position_interface_1{"test_joint1", "motor_desired_position", &example_values_[8]};
+  hardware_interface::StateInterface mposition_error_interface_1{"test_joint1", "motor_position_error", &example_values_[0]};
+  hardware_interface::StateInterface mvelocity_interface_1{"test_joint1", "motor_velocity", &example_values_[2]};
+  hardware_interface::StateInterface mdesired_velocity_interface_1{"test_joint1", "motor_desired_velocity", &example_values_[4]};
+  hardware_interface::StateInterface mvelocity_error_interface_1{"test_joint1", "motor_velocity_error", &example_values_[6]};
+  hardware_interface::StateInterface mdesired_effort_interface_1{"test_joint1", "motor_desired_effort", &example_values_[8]};
+  hardware_interface::StateInterface power_interface_1{"test_joint1", "power", &example_values_[0]};
+  hardware_interface::StateInterface current_interface_1{"test_joint1", "current", &example_values_[2]};
+  hardware_interface::StateInterface voltage_interface_1{"test_joint1", "voltage", &example_values_[4]};
+  hardware_interface::StateInterface pressure_interface_1{"test_joint1", "pressure", &example_values_[4]};
 
-  const std::string joint_name_ = "test_joint";
-  
-  hardware_interface::StateInterface interface_1{"test_joint1", "temperature", &temperature_values_[0]};
-  hardware_interface::StateInterface interface_2{"test_joint1", "fault", &fault};
-  hardware_interface::StateInterface interface_3{"test_joint1", "motor_effort", &motor_effort};
+  hardware_interface::StateInterface desired_position_interface_1{"test_joint1", "desired_position", &example_values_[6]};
+  hardware_interface::StateInterface position_error_interface_1{"test_joint1", "position_error", &example_values_[8]};
+  hardware_interface::StateInterface desired_velocity_interface_1{"test_joint1", "desired_velocity", &example_values_[0]};
+  hardware_interface::StateInterface velocity_error_interface_1{"test_joint1", "velocity_error", &example_values_[2]};
+  hardware_interface::StateInterface desired_effort_interface_1{"test_joint1", "desired_effort", &example_values_[4]};
 
-  hardware_interface::StateInterface interface_4{"test_joint2", "temperature", &temperature_values_[2]};
-  hardware_interface::StateInterface interface_5{"test_joint2", "fault", &fault};
-  hardware_interface::StateInterface interface_6{"test_joint2", "motor_effort", &motor_effort};
-  
-  hardware_interface::StateInterface interface_7{"test_joint3", "pressure", &temperature_values_[4]};
-  
-  
+  hardware_interface::StateInterface mode_interface_1{"test_joint1", "mode", &fault};
+
+  //joint2
+  hardware_interface::StateInterface temperature_interface_2{"test_joint2", "temperature", &example_values_[2]};
+  hardware_interface::StateInterface fault_interface_2{"test_joint2", "fault", &fault};
+  hardware_interface::StateInterface motor_effort_interface_2{"test_joint2", "motor_effort", &example_values_[6]};
+  hardware_interface::StateInterface mposition_interface_2{"test_joint2", "motor_position", &example_values_[8]};
+  hardware_interface::StateInterface mdesired_position_interface_2{"test_joint2", "motor_desired_position", &example_values_[0]};
+  hardware_interface::StateInterface mposition_error_interface_2{"test_joint2", "motor_position_error", &example_values_[2]};
+  hardware_interface::StateInterface mvelocity_interface_2{"test_joint2", "motor_velocity", &example_values_[4]};
+  hardware_interface::StateInterface mdesired_velocity_interface_2{"test_joint2", "motor_desired_velocity", &example_values_[6]};
+  hardware_interface::StateInterface mvelocity_error_interface_2{"test_joint2", "motor_velocity_error", &example_values_[8]};
+  hardware_interface::StateInterface mdesired_effort_interface_2{"test_joint2", "motor_desired_effort", &example_values_[0]};
+  hardware_interface::StateInterface power_interface_2{"test_joint2", "power", &example_values_[2]};
+  hardware_interface::StateInterface current_interface_2{"test_joint2", "current", &example_values_[4]};
+  hardware_interface::StateInterface voltage_interface_2{"test_joint2", "voltage", &example_values_[6]};
+  hardware_interface::StateInterface pressure_interface_2{"test_joint2", "pressure", &example_values_[8]};
+
+  hardware_interface::StateInterface desired_position_interface_2{"test_joint2", "desired_position", &example_values_[0]};
+  hardware_interface::StateInterface position_error_interface_2{"test_joint2", "position_error", &example_values_[2]};
+  hardware_interface::StateInterface desired_velocity_interface_2{"test_joint2", "desired_velocity", &example_values_[4]};
+  hardware_interface::StateInterface velocity_error_interface_2{"test_joint2", "velocity_error", &example_values_[6]};
+  hardware_interface::StateInterface desired_effort_interface_2{"test_joint2", "desired_effort", &example_values_[8]};
+
+  hardware_interface::StateInterface mode_interface_2{"test_joint1", "mode", &fault};
+
+  //joint3
+  hardware_interface::StateInterface pressure_interface_3{"test_joint3", "pressure", &example_values_[6]};
+
+
   std::unique_ptr<FriendDiagnosticBroadcasterTest> diagnostic_broadcaster_;
   
   template <typename T>

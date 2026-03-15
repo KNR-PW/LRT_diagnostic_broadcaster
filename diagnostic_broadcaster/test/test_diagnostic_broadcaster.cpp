@@ -23,21 +23,79 @@ void DiagnosticBroadcasterTest::SetUpDiagnosticBroadcaster()
     node->declare_parameter<std::vector<std::string>>(
         "diagnostic_broadcaster.joint_names", std::vector<std::string>{});
     node->declare_parameter<std::vector<std::string>>(
-        "diagnostic_broadcaster.interface_names", std::vector<std::string>{"temperature", "fault"});
+        "diagnostic_broadcaster.interface_names", std::vector<std::string>{
+          "temperature",
+          "fault", 
+          "motor_effort", 
+          "motor_position", 
+          "motor_desired_position", 
+          "motor_position_error", 
+          "motor_velocity", 
+          "motor_desired_velocity", 
+          "motor_velocity_error", 
+          "motor_desired_effort", 
+          "power", 
+          "current", 
+          "voltage",
+          "desired_position",
+          "position_error",
+          "desired_velocity",
+          "velocity_error",
+          "desired_effort"
+        });
     node->declare_parameter<double>(
         "diagnostic_broadcaster.interface_params.__map_interface_names.update_threshold", 0.1);
 
     diagnostic_broadcaster_->init("test_diagnostic_broadcaster", "", rclcpp::NodeOptions());
 
     std::vector<LoanedStateInterface> state_interfaces;
-    state_interfaces.emplace_back(interface_1);
-    state_interfaces.emplace_back(interface_2);
-    state_interfaces.emplace_back(interface_3);
-    state_interfaces.emplace_back(interface_4);
-    state_interfaces.emplace_back(interface_5);
-    state_interfaces.emplace_back(interface_6);
-    state_interfaces.emplace_back(interface_7);
+    state_interfaces.emplace_back(temperature_interface_1);
+    state_interfaces.emplace_back(fault_interface_1);
+    state_interfaces.emplace_back(motor_effort_interface_1);
+    state_interfaces.emplace_back(mposition_interface_1);
+    state_interfaces.emplace_back(mdesired_position_interface_1);
+    state_interfaces.emplace_back(mposition_error_interface_1);
+    state_interfaces.emplace_back(mvelocity_interface_1);
+    state_interfaces.emplace_back(mdesired_velocity_interface_1);
+    state_interfaces.emplace_back(mvelocity_error_interface_1);
+    state_interfaces.emplace_back(mdesired_effort_interface_1);
+    state_interfaces.emplace_back(power_interface_1);
+    state_interfaces.emplace_back(current_interface_1);
+    state_interfaces.emplace_back(voltage_interface_1);
 
+    state_interfaces.emplace_back(desired_position_interface_1);
+    state_interfaces.emplace_back(position_error_interface_1);
+    state_interfaces.emplace_back(desired_velocity_interface_1);
+    state_interfaces.emplace_back(velocity_error_interface_1);
+    state_interfaces.emplace_back(desired_effort_interface_1);
+
+    state_interfaces.emplace_back(mode_interface_1);
+
+    state_interfaces.emplace_back(temperature_interface_2);
+    state_interfaces.emplace_back(fault_interface_2);
+    state_interfaces.emplace_back(motor_effort_interface_2);
+    state_interfaces.emplace_back(mposition_interface_2);
+    state_interfaces.emplace_back(mdesired_position_interface_2);
+    state_interfaces.emplace_back(mposition_error_interface_2);
+    state_interfaces.emplace_back(mvelocity_interface_2);
+    state_interfaces.emplace_back(mdesired_velocity_interface_2);
+    state_interfaces.emplace_back(mvelocity_error_interface_2);
+    state_interfaces.emplace_back(mdesired_effort_interface_2);
+    state_interfaces.emplace_back(power_interface_2);
+    state_interfaces.emplace_back(current_interface_2);
+    state_interfaces.emplace_back(voltage_interface_2);
+
+    state_interfaces.emplace_back(desired_position_interface_2);
+    state_interfaces.emplace_back(position_error_interface_2);
+    state_interfaces.emplace_back(desired_velocity_interface_2);
+    state_interfaces.emplace_back(velocity_error_interface_2);
+    state_interfaces.emplace_back(desired_effort_interface_2);
+
+    state_interfaces.emplace_back(mode_interface_2);
+
+
+    state_interfaces.emplace_back(pressure_interface_3);
+    
     EXPECT_TRUE(diagnostic_broadcaster_->get_joint_names().empty());
 
     diagnostic_broadcaster_->assign_interfaces({}, std::move(state_interfaces));
@@ -65,7 +123,7 @@ TEST_F(DiagnosticBroadcasterTest, Configure_Success)
     state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
   
 
-  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
+  ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 39lu);
 }
 TEST_F(DiagnosticBroadcasterTest, Activate_Success)
 {
@@ -85,7 +143,7 @@ TEST_F(DiagnosticBroadcasterTest, Activate_Success)
     const auto state_interface_conf = diagnostic_broadcaster_->state_interface_configuration();
     EXPECT_EQ(
       state_interface_conf.type, controller_interface::interface_configuration_type::ALL);
-    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 7lu);
+    ASSERT_EQ(diagnostic_broadcaster_->state_interfaces_.size(), 39lu);
   }
 
   ASSERT_EQ(
@@ -145,23 +203,53 @@ TEST_F(DiagnosticBroadcasterTest, PublishSuccess)
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
   // Verify content of diagnostic message
-  EXPECT_EQ(diagnostic_msg.joints.size(), 2lu);
+  EXPECT_EQ(diagnostic_msg.names.size(), 2lu);
 
   EXPECT_EQ(diagnostic_msg.header.frame_id, "Diagnostics");
-  EXPECT_EQ(diagnostic_msg.joints[0], "test_joint1");
-  EXPECT_EQ(diagnostic_msg.joints[1], "test_joint2");
+  EXPECT_EQ(diagnostic_msg.names[0], "test_joint1");
+  EXPECT_EQ(diagnostic_msg.names[1], "test_joint2");
 
-  EXPECT_EQ(diagnostic_msg.temperature[0], temperature_values_[0]);
-  EXPECT_EQ(diagnostic_msg.temperature[1], temperature_values_[2]);
+  EXPECT_EQ(diagnostic_msg.temperature[0], example_values_[0]);
+  EXPECT_EQ(diagnostic_msg.temperature[1], example_values_[2]);
   
   int8_t expected = 1;
   EXPECT_EQ(diagnostic_msg.fault[0], expected);
   EXPECT_EQ(diagnostic_msg.fault[1], expected);
 
-  EXPECT_EQ(diagnostic_msg.motor_effort[0], motor_effort);
-  EXPECT_EQ(diagnostic_msg.motor_effort[1], motor_effort);
+  EXPECT_EQ(diagnostic_msg.motor_effort[0], example_values_[4]);
+  EXPECT_EQ(diagnostic_msg.motor_effort[1], example_values_[6]);
 
+  EXPECT_EQ(diagnostic_msg.motor_position[0], example_values_[6]);
+  EXPECT_EQ(diagnostic_msg.motor_position[1], example_values_[8]);
 
+  EXPECT_EQ(diagnostic_msg.motor_desired_position[0], example_values_[8]);
+  EXPECT_EQ(diagnostic_msg.motor_desired_position[1], example_values_[0]);
+
+  EXPECT_EQ(diagnostic_msg.motor_position_error[0], example_values_[0]);
+  EXPECT_EQ(diagnostic_msg.motor_position_error[1], example_values_[2]);
+
+  EXPECT_EQ(diagnostic_msg.motor_velocity[0], example_values_[2]);
+  EXPECT_EQ(diagnostic_msg.motor_velocity[1], example_values_[4]);
+
+  EXPECT_EQ(diagnostic_msg.motor_desired_velocity[0], example_values_[4]);
+  EXPECT_EQ(diagnostic_msg.motor_desired_velocity[1], example_values_[6]);
+
+  EXPECT_EQ(diagnostic_msg.motor_velocity_error[0], example_values_[6]);
+  EXPECT_EQ(diagnostic_msg.motor_velocity_error[1], example_values_[8]);
+
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[0], example_values_[8]);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], example_values_[0]);
+
+  EXPECT_EQ(diagnostic_msg.power[0], example_values_[0]);
+  EXPECT_EQ(diagnostic_msg.power[1], example_values_[2]);
+
+  EXPECT_EQ(diagnostic_msg.current[0], example_values_[2]);
+  EXPECT_EQ(diagnostic_msg.current[1], example_values_[4]);
+
+  EXPECT_EQ(diagnostic_msg.voltage[0], example_values_[4]);
+  EXPECT_EQ(diagnostic_msg.voltage[1], example_values_[6]);
+
+  EXPECT_EQ(diagnostic_msg.mode[0], fault);
 
 }
 
@@ -182,18 +270,20 @@ TEST_F(DiagnosticBroadcasterTest, ThresholdTest)
 
 
   // Value greater than threshold
-  temperature_values_[0] = 31.0f; 
+  example_values_[0] = 31.0f; 
 
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
-  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0f);
+  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], 31.0);
 
   //Value smaller than threshold
-  temperature_values_[0] = 31.05f; 
+  example_values_[0] += 0.05; 
 
   subscribe_and_get_message("/test_diagnostic_broadcaster/diagnostics", diagnostic_msg);
 
-  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0f);
+  EXPECT_EQ(diagnostic_msg.temperature[0], 31.0);
+  EXPECT_EQ(diagnostic_msg.motor_desired_effort[1], 31.0);
 }
 
 

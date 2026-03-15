@@ -78,6 +78,55 @@ namespace diagnostic_broadcaster
         loaned_state_interfaces_t meffort_interfaces_;
         std::vector<double> previous_meffort_val_;
         
+        loaned_state_interfaces_t mposition_interfaces_;
+        std::vector<double> previous_mposition_val_;
+
+        loaned_state_interfaces_t mdesired_position_interfaces_;
+        std::vector<double> previous_mdesired_position_val_;
+
+        loaned_state_interfaces_t mposition_error_interfaces_;
+        std::vector<double> previous_mposition_error_val_;
+        
+        loaned_state_interfaces_t mvelocity_interfaces_;
+        std::vector<double> previous_mvelocity_val_;
+
+        loaned_state_interfaces_t mdesired_velocity_interfaces_;
+        std::vector<double> previous_mdesired_velocity_val_;
+
+        loaned_state_interfaces_t mvelocity_error_interfaces_;
+        std::vector<double> previous_mvelocity_error_val_;
+
+        loaned_state_interfaces_t mdesired_effort_interfaces_;
+        std::vector<double> previous_mdesired_effort_val_;
+
+        loaned_state_interfaces_t power_interfaces_;
+        std::vector<double> previous_power_val_;
+
+        loaned_state_interfaces_t current_interfaces_;
+        std::vector<double> previous_current_val_;
+
+        loaned_state_interfaces_t voltage_interfaces_;
+        std::vector<double> previous_voltage_val_;
+        
+        // Interfaces for data from software
+
+        loaned_state_interfaces_t desired_position_interfaces_;
+        std::vector<double> previous_desired_position_val_;
+
+        loaned_state_interfaces_t position_error_interfaces_;
+        std::vector<double> previous_position_error_val_;
+
+        loaned_state_interfaces_t desired_velocity_interfaces_;
+        std::vector<double> previous_desired_velocity_val_;
+
+        loaned_state_interfaces_t velocity_error_interfaces_;
+        std::vector<double> previous_velocity_error_val_;
+
+        loaned_state_interfaces_t desired_effort_interfaces_;
+        std::vector<double> previous_desired_effort_val_;
+
+        loaned_state_interfaces_t mode_interfaces_;
+
 
         rclcpp::Publisher<diagnostic_msgs::msg::Diagnostics>::SharedPtr diagnostic_publisher_;
 
