@@ -11,7 +11,7 @@ https://releases.ubuntu.com/jammy/
 - [generate_parameters_library](https://github.com/PickNikRobotics/generate_parameter_library)
 ## Installation
 - ```git clone https://github.com/KNR-PW/LRT_diagnostic_broadcaster.git```
-- ```colcon build```
+- ```colcon build --packages-up-to diagnostics --cmake-args -DCMAKE_BUILD_TYPE=Release```
 
 ## Selecting interfaces
 > [!IMPORTANT]
